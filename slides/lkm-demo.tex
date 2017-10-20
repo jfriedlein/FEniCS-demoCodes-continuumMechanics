@@ -106,19 +106,19 @@
   \node at (2.9, 1.5) [right,xshift=0.1cm]{$\v t^p$};
   }
 
-  \onslide<1-2>{
-  \fill[pattern=north west lines, pattern color=black] (0, -0.25) rectangle +(-0.25, 1.5);
-  \draw[thick] (0, -0.25) -- +(0, 1.5);
-  \fill[pattern=north west lines, pattern color=black] (3, -0.25) rectangle +(0.25, 1.5);
-  \draw[thick] (3, -0.25) -- +(0, 1.5);
-  }
-
   \onslide<2>{
   \node at(1.5,0.4) {\includegraphics[width=6.6cm]{../01-elasto-static/01-tractions/plot.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.4]
    \begin{axis}[verticalbar,point meta min=-10,point meta max=10] \addplot [draw=none] coordinates {(0,0)}; \end{axis}
    \draw (0, 0) node[above right, xshift=0cm,yshift=0.2cm]{$\sigma_{11}$ in $\mathrm{MPa}$};
   \end{scope}   
+  }
+
+  \onslide<1-2>{
+  \fill[pattern=north west lines, pattern color=black] (0, -0.25) rectangle +(-0.25, 1.5);
+  \draw[thick] (0, -0.25) -- +(0, 1.5);
+  \fill[pattern=north west lines, pattern color=black] (3, -0.25) rectangle +(0.25, 1.5);
+  \draw[thick] (3, -0.25) -- +(0, 1.5);
   }
   
   \begin{scope}
@@ -167,13 +167,6 @@
    \draw[-latex,thick] (1.5, 0.5) -- node[right] {$\v b$} +(0, -0.4);
   }
 
-  \onslide<1-2>{
-  \fill[pattern=north west lines, pattern color=black] (0, -0.25) rectangle +(-0.25, 1.5);
-  \draw[thick] (0, -0.25) -- +(0, 1.5);
-%   \fill[pattern=north west lines, pattern color=black] (3, -0.25) rectangle +(0.25, 1.5);
-%   \draw[thick] (3, -0.25) -- +(0, 1.5);
-  }
-
   \onslide<2>{
   \node at(1.5,0.35) {\includegraphics[width=6.6cm]{../01-elasto-static/02-gravity/plot.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.4]
@@ -182,6 +175,13 @@
   \end{scope}   
   }
   
+  \onslide<1-2>{
+  \fill[pattern=north west lines, pattern color=black] (0, -0.25) rectangle +(-0.25, 1.5);
+  \draw[thick] (0, -0.25) -- +(0, 1.5);
+%   \fill[pattern=north west lines, pattern color=black] (3, -0.25) rectangle +(0.25, 1.5);
+%   \draw[thick] (3, -0.25) -- +(0, 1.5);
+  }
+
   \begin{scope}
    \onslide<1>{\node at (0, -1) [right]{\parbox{3cm}{$E = 200 \, \mathrm{GPa}$ \\ $\nu = 0.3$ \\ $\ell = 1\,\mathrm{m}$}};}
    \onslide<1>{\node at (1.5, -1) [right]{\parbox{3cm}{$\v b = - \rho \, g \, \v e_2$ \\ $\rho = 8000 \, \mathrm{kg}/\mathrm{m}^3$ \\ $g = 9.81 \, \mathrm{N}/\mathrm{kg}$}};}
@@ -229,13 +229,6 @@
     \draw[thick,-latex] (3.3,0.3) arc[x radius=0.1, y radius=0.4, start angle=-10, end angle=190] node[below right,xshift=1mm]{$\v u^p$};
   }
 
-  \onslide<1>{
-  \fill[pattern=north west lines, pattern color=black] (0, -0.25) rectangle +(-0.25, 1.5);
-  \draw[thick] (0, -0.25) -- +(0, 1.5);
-%   \fill[pattern=north west lines, pattern color=black] (3, -0.25) rectangle +(0.25, 1.5);
-%   \draw[thick] (3, -0.25) -- +(0, 1.5);
-  }
-
   \onslide<2>{
   \node at(1.5,0.35) {\includegraphics[width=6.6cm]{../01-elasto-static/03-rotation/plot3d.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.4]
@@ -244,6 +237,13 @@
   \end{scope}   
   }
   
+  \onslide<1>{
+  \fill[pattern=north west lines, pattern color=black] (0, -0.25) rectangle +(-0.25, 1.5);
+  \draw[thick] (0, -0.25) -- +(0, 1.5);
+%   \fill[pattern=north west lines, pattern color=black] (3, -0.25) rectangle +(0.25, 1.5);
+%   \draw[thick] (3, -0.25) -- +(0, 1.5);
+  }
+
   \begin{scope}%[yshift=-1cm]
    \onslide<1>{\node at (0, -1) [right]{\parbox{3cm}{$E = 200 \, \mathrm{GPa}$ \\ $\nu = 0.3$ \\ $\ell = 1\,\mathrm{m}$}};}
    \onslide<1>{\node at (1.5, -1) [right]{$\v u^p :$ ``rotate by $1^\circ$'' on $\partial \mathcal{B}^u_\text{right}$};}
