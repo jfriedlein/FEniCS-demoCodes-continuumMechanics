@@ -36,52 +36,59 @@
 
 \renewcommand{\v}[1]{\boldsymbol{#1}}
 
-\pgfplotsset{compat=1.10}
+\pgfplotsset{compat=newest}
 \pgfplotsset{verticalbar/.style={
-    xmin=0.0, xmax=0.1, ymin=0.0, ymax=0.1,
+    xmin=0.0,xmax=0.1,ymin=0.0,ymax=0.1,
+%     xshift=3.5cm,yshift=1.3cm,scale=0.4,
     hide axis,
     scale only axis,
-    height=0pt,
-    width=0pt,
-    colormap={}{rgb255(0cm)=(0,0,255) rgb255(1cm)=(0,255,255)
-      rgb255(3cm)=(255,255,0) rgb255(4cm)=(255,0,0)},
-    colorbar,
+    height=0,
+    width=0,
+    title style={at(1,1), anchor=south west, font=\normalsize},
+    colormap={}{rgb255(0cm)=(0,0,255) rgb255(0.75cm)=(0,255,255)
+      rgb255(1.5cm)=(0,255,0) rgb255(2.25cm)=(255,255,0) rgb255(3cm)=(255,0,0)},
+    colorbar,% sampled,
     colorbar style={
-% 	font=\scriptsize,
-        height=4cm,
-        width=0.4cm,
-        xshift=0cm,
+ 	font=\footnotesize,
+% 	samples=16,
+	scaled y ticks=false,
+	/pgf/number format/fixed,
+	extra y ticks={\pgfkeysvalueof{/pgfplots/ymin},\pgfkeysvalueof{/pgfplots/ymax}},
+	extra y tick style={yticklabel style={xshift=-0.7em, anchor=east}},
+        height=3cm,
+        width=0.3cm,
+        xshift=-1.0cm,
         yshift=0cm
     },
   }
 }
-\pgfplotsset{horizontalbar/.style={
-    hide axis,
-    scale only axis,
-    height=0pt,
-    width=0pt,
-    colormap={}{rgb255(0cm)=(0,0,255) rgb255(1cm)=(0,255,255)
-      rgb255(3cm)=(255,255,0) rgb255(4cm)=(255,0,0)},
-    colorbar horizontal,
-    colorbar style={
-% 	font=\scriptsize,
-        height=0.4cm,
-        width=4cm,
-%         xshift=-2cm,
-%         yshift=-1.9cm
-    }
-  }
-}
+% \pgfplotsset{horizontalbar/.style={
+%     hide axis,
+%     scale only axis,
+%     height=0pt,
+%     width=0pt,
+%     colormap={}{rgb255(0cm)=(0,0,255) rgb255(1cm)=(0,255,255)
+%       rgb255(3cm)=(255,255,0) rgb255(4cm)=(255,0,0)},
+%     colorbar horizontal,
+%     colorbar style={
+% % 	font=\scriptsize,
+%         height=0.4cm,
+%         width=4cm,
+% %         xshift=-2cm,
+% %         yshift=-1.9cm
+%     }
+%   }
+% }
 
 \begin{document}
 
 \begin{frame}
  \frametitle{Demo 1-1 $\vert$ \bfseries Elastostatics}
- \framesubtitle{\bfseries surface tractions}
+ \framesubtitle{\bfseries prescribed surface tractions}
  \begin{overlayarea}{0.9\textwidth}{0.9\textheight}
 %  \vspace*{1ex}
  \begin{center}
- \begin{tikzpicture}[scale=2.2]
+ \begin{tikzpicture}[scale=2]
   \onslide<1>{
   \fill[gray!10, draw=black] (0, 1) rectangle (3, 0) node[above left, black]{$\mathcal{B}$};
   }
@@ -107,14 +114,28 @@
   }
 
   \onslide<2>{
-  \node at(1.5,0.4) {\includegraphics[width=6.6cm]{../01-elasto-static/01-tractions/plot.png}};
-  \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.4]
-   \begin{axis}[verticalbar,point meta min=-10,point meta max=10] \addplot [draw=none] coordinates {(0,0)}; \end{axis}
-   \draw (0, 0) node[above right, xshift=0cm,yshift=0.2cm]{$\sigma_{11}$ in $\mathrm{MPa}$};
+  \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_11.png}};
+  \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
+   \begin{axis}[verticalbar,point meta min=-7.2,point meta max=10.3,title={$\sigma_{11}$ in $\mathrm{MPa}$}] 
+    \addplot [draw=none] coordinates {(0,0)}; \end{axis}
+  \end{scope}   
+  }
+  \onslide<3>{
+  \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_22.png}};
+  \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
+   \begin{axis}[verticalbar,point meta min=-1.87,point meta max=5.09,title={$\sigma_{22}$ in $\mathrm{MPa}$}] 
+    \addplot [draw=none] coordinates {(0,0)}; \end{axis}
+  \end{scope}   
+  }
+  \onslide<4>{
+  \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_12.png}};
+  \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
+   \begin{axis}[verticalbar,point meta min=-3.75,point meta max=0.02,title={$\sigma_{12}$ in $\mathrm{MPa}$}] 
+    \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
 
-  \onslide<1-2>{
+  \onslide<1-4>{
   \fill[pattern=north west lines, pattern color=black] (0, -0.25) rectangle +(-0.25, 1.5);
   \draw[thick] (0, -0.25) -- +(0, 1.5);
   \fill[pattern=north west lines, pattern color=black] (3, -0.25) rectangle +(0.25, 1.5);
@@ -124,7 +145,7 @@
   \begin{scope}
    \onslide<1>{\node at (0, -1) [right]{\parbox{3cm}{$E = 200 \, \mathrm{GPa}$ \\ $\nu = 0.3$ \\ $\ell = 1\,\mathrm{m}$}};}
    \onslide<1>{\node at (1.5, -1) [right]{$[t^p_i] = -\begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix} \mathrm{MPa}$ on $\partial \mathcal{B}^t_\text{top}$};}
-   \onslide<2>{\node at (0, -0.5) [right,font=\footnotesize]{$\v u$ scaled with a factor of $5000$};}
+   \onslide<2-4>{\node at (0, -0.5) [right,font=\footnotesize]{$\v u$ scaled with a factor of $5000$};}
   \end{scope}
   
   \end{tikzpicture}
@@ -133,8 +154,15 @@
  \end{overlayarea}
 \end{frame}
 
-
-
+% 
+% \begin{frame}
+%  \begin{tikzpicture}
+%    \node at(0,0) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_11.png}};
+%    \begin{axis}[verticalbar,point meta min=-7.2,point meta max=10.3] \addplot [draw=none] coordinates {(0,0)}; \end{axis}
+%    \draw (0, 0) node[above right, xshift=0cm,yshift=0cm]{$\sigma_{11}$ in $\mathrm{MPa}$};
+%  \end{tikzpicture}
+% \end{frame}
+% 
 
 \begin{frame}
  \frametitle{Demo 1-2 $\vert$ \bfseries Elastostatics}
@@ -142,7 +170,7 @@
  \begin{overlayarea}{0.9\textwidth}{0.9\textheight}
 %  \vspace*{1ex}
  \begin{center}
- \begin{tikzpicture}[scale=2.2]
+ \begin{tikzpicture}[scale=2]
   \onslide<1>{
   \fill[gray!10, draw=black] (0, 1) rectangle (3, 0) node[above left, black]{$\mathcal{B}$};
   }
@@ -168,14 +196,28 @@
   }
 
   \onslide<2>{
-  \node at(1.5,0.35) {\includegraphics[width=6.6cm]{../01-elasto-static/02-gravity/plot.png}};
-  \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.4]
-   \begin{axis}[verticalbar,point meta min=-4,point meta max=4] \addplot [draw=none] coordinates {(0,0)}; \end{axis}
-   \draw (0, 0) node[above right, xshift=0cm,yshift=0.2cm]{$\sigma_{11}$ in $\mathrm{MPa}$};
+  \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/02-gravity/plot_11.png}};
+  \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
+   \begin{axis}[verticalbar,point meta min=-4.04,point meta max=3.94,title={$\sigma_{11}$ in $\mathrm{MPa}$}]
+   \addplot [draw=none] coordinates {(0,0)}; \end{axis}
+  \end{scope}   
+  }
+  \onslide<3>{
+  \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/02-gravity/plot_22.png}};
+  \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
+   \begin{axis}[verticalbar,point meta min=-0.774,point meta max=1.6,title={$\sigma_{22}$ in $\mathrm{MPa}$}]
+   \addplot [draw=none] coordinates {(0,0)}; \end{axis}
+  \end{scope}   
+  }
+  \onslide<4>{
+  \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/02-gravity/plot_12.png}};
+  \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
+   \begin{axis}[verticalbar,point meta min=-0.0209,point meta max=0.02,title={$\sigma_{12}$ in $\mathrm{MPa}$}]
+   \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
   
-  \onslide<1-2>{
+  \onslide<1-4>{
   \fill[pattern=north west lines, pattern color=black] (0, -0.25) rectangle +(-0.25, 1.5);
   \draw[thick] (0, -0.25) -- +(0, 1.5);
 %   \fill[pattern=north west lines, pattern color=black] (3, -0.25) rectangle +(0.25, 1.5);
@@ -185,7 +227,7 @@
   \begin{scope}
    \onslide<1>{\node at (0, -1) [right]{\parbox{3cm}{$E = 200 \, \mathrm{GPa}$ \\ $\nu = 0.3$ \\ $\ell = 1\,\mathrm{m}$}};}
    \onslide<1>{\node at (1.5, -1) [right]{\parbox{3cm}{$\v b = - \rho \, g \, \v e_2$ \\ $\rho = 8000 \, \mathrm{kg}/\mathrm{m}^3$ \\ $g = 9.81 \, \mathrm{N}/\mathrm{kg}$}};}
-   \onslide<2>{\node at (0, -0.5) [right,font=\footnotesize]{$\v u$ scaled with a factor of $5000$};}
+   \onslide<2-4>{\node at (0, -0.5) [right,font=\footnotesize]{$\v u$ scaled with a factor of $5000$};}
   \end{scope}
   
   \end{tikzpicture}
@@ -201,7 +243,7 @@
  \begin{overlayarea}{0.9\textwidth}{0.9\textheight}
 %  \vspace*{1ex}
  \begin{center}
- \begin{tikzpicture}[scale=2.2]
+ \begin{tikzpicture}[scale=2]
 %  \draw[draw=none] (-1, -2) rectangle (8, 2);
   \onslide<1>{
   \fill[gray!10, draw=black] (0, 1) rectangle (3, 0) node[above left, black]{$\mathcal{B}$};
@@ -229,11 +271,25 @@
     \draw[thick,-latex] (3.3,0.3) arc[x radius=0.1, y radius=0.4, start angle=-10, end angle=190] node[below right,xshift=1mm]{$\v u^p$};
   }
 
-  \onslide<2>{
-  \node at(1.5,0.35) {\includegraphics[width=6.6cm]{../01-elasto-static/03-rotation/plot3d.png}};
-  \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.4]
-   \begin{axis}[verticalbar,point meta min=0,point meta max=500,colorbar/.append style={ytick={0,100,500}}] \addplot [draw=none] coordinates {(0,0)}; \end{axis}
-   \draw (0, 0) node[above right, xshift=0cm,yshift=0.2cm]{$\sigma_{\mathrm{vM}}$ in $\mathrm{MPa}$};
+ \onslide<2>{
+  \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/03-rotation/plot_11.png}};
+  \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
+   \begin{axis}[verticalbar,point meta min=-511,point meta max=440,title={$\sigma_{11}$ in $\mathrm{MPa}$}]
+   \addplot [draw=none] coordinates {(0,0)}; \end{axis}
+  \end{scope}   
+  }
+  \onslide<3>{
+  \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/03-rotation/plot_12.png}};
+  \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
+   \begin{axis}[verticalbar,point meta min=-306,point meta max=306,title={$\sigma_{12}$ in $\mathrm{MPa}$}]
+   \addplot [draw=none] coordinates {(0,0)}; \end{axis}
+  \end{scope}   
+  }
+  \onslide<4>{
+  \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/03-rotation/plot_13.png}};
+  \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
+   \begin{axis}[verticalbar,point meta min=-306,point meta max=306,title={$\sigma_{13}$ in $\mathrm{MPa}$}]
+   \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
   
@@ -247,7 +303,7 @@
   \begin{scope}%[yshift=-1cm]
    \onslide<1>{\node at (0, -1) [right]{\parbox{3cm}{$E = 200 \, \mathrm{GPa}$ \\ $\nu = 0.3$ \\ $\ell = 1\,\mathrm{m}$}};}
    \onslide<1>{\node at (1.5, -1) [right]{$\v u^p :$ ``rotate by $1^\circ$'' on $\partial \mathcal{B}^u_\text{right}$};}
-   \onslide<2>{\node at (0, -1) [right,font=\footnotesize]{$\v u$ scaled with a factor of $30$};}
+   \onslide<2-4>{\node at (0, -1) [right,font=\footnotesize]{$\v u$ scaled with a factor of $30$};}
   \end{scope}
   
   \end{tikzpicture}
