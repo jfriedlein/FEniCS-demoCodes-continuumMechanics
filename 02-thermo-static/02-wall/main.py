@@ -7,7 +7,7 @@ from dolfin import *
 # Define geometry and mesh
 d = 3
 p0 = Point(0.0, 0.0, 0.0)
-p1 = Point(30.0, 10.0, 10.0)
+p1 = Point(0.30, 0.10, 0.10)
 mesh = BoxMesh(p0, p1, 30, 10, 10)
 
 # Define boundaries
