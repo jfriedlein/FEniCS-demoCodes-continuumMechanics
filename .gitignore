@@ -6,4 +6,8 @@
 *.snm
 *.backup
 *.toc
+*.pdf
 
+*.vtu
+*.pvd
+*.pvsm
