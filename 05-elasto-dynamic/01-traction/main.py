@@ -8,8 +8,8 @@ parameters["form_compiler"]["optimize"] = True
 
 # Time definitions
 t = 0.0
-T = 0.001
-num_steps = 200
+T = 0.003
+num_steps = 300
 dt = T / num_steps
 
 #Parameters for Newmark (Average acceleration)
@@ -74,7 +74,7 @@ g = 9.81
 # Volume force/ heat source and prescribed tractions
 #b = as_vector((0.0, -rho*g))
 b = Constant((0.0, 0.0))
-t_p = Expression(('(t<1.0*t1)?1.0*(-m/t1*fabs(t-t1)+m):0.0', '(t<1.0*t1)?-0.1*(-m/t1*fabs(t-t1)+m):0.0'), degree=2, t1=0.1*T, m=1.e6, t=0)
+t_p = Expression(('(t<1.0*t1)?1.0*(-m/t1*fabs(t-t1)+m):0.0', '(t<1.0*t1)?-0.1*(-m/t1*fabs(t-t1)+m):0.0'), degree=2, t1=0.333*T, m=1.e6, t=0)
 
 # Prescribed Dirichlet boundary data
 #u_p = Expression(('m*t', '0.0', '0.0'), degree=1, m=-0.2/T, t=0)

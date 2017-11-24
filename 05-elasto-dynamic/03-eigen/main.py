@@ -25,7 +25,7 @@ nm_gamma = 0.5
 # Define geometry and mesh
 p_llb = Point(0.0, 0.0, 0.0)
 p_rtf = Point(0.04, 0.01, 0.01)
-mesh = RectangleMesh(p_llb, p_rtf, 20, 5)
+mesh = RectangleMesh(p_llb, p_rtf, 32, 8)
 #mesh = BoxMesh(p_llb, p_rtf, 4, 1, 1)
 
 # Define boundaries
@@ -118,7 +118,8 @@ T = 2*pi/sqrt(r)
 dt = T / num_steps
 
 dirname = "ev"+str(j)+"/"
-mkdir(dirname)
+if not path.exists(dirname):
+	mkdir(dirname)
 
 ################################
 #### WEAK FORM (+NEWMARK) ######
