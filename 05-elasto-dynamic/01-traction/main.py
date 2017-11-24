@@ -74,7 +74,7 @@ g = 9.81
 # Volume force/ heat source and prescribed tractions
 #b = as_vector((0.0, -rho*g))
 b = Constant((0.0, 0.0))
-t_p = Expression(('(t<1.0*t1)?10.0*(-m/t1*fabs(t-t1)+m):0.0', '(t<1.0*t1)?-(-m/t1*fabs(t-t1)+m):0.0'), degree=2, t1=0.1*T, m=1.e5, t=0)
+t_p = Expression(('(t<1.0*t1)?1.0*(-m/t1*fabs(t-t1)+m):0.0', '(t<1.0*t1)?-0.1*(-m/t1*fabs(t-t1)+m):0.0'), degree=2, t1=0.1*T, m=1.e6, t=0)
 
 # Prescribed Dirichlet boundary data
 #u_p = Expression(('m*t', '0.0', '0.0'), degree=1, m=-0.2/T, t=0)
