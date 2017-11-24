@@ -1,0 +1,134 @@
+
+\begin{frame}
+ \frametitle{Demo 5-1 $\vert$ \bfseries Elasto-dynamics}
+ \framesubtitle{\bfseries time-dependent prescribed tractions}
+ \begin{overlayarea}{0.9\textwidth}{0.9\textheight}
+%   \vspace*{3ex}
+ \begin{center}
+ \begin{tikzpicture}
+  \begin{scope}[scale=1.8]
+  \onslide<1>{
+  \fill[gray!10, draw=black] (0, 1) rectangle (4, 0) node[above left, black]{$\mathcal{B}$};
+  }
+
+  \onslide<1>{
+  \draw[thin,gray] (0, 0) -- +(0, -0.5);
+  \draw[thin,gray] (4, 0) -- +(0, -0.5);
+  \draw[<->,thin,gray] (0, -0.4) -- node[fill=white]{$4 \ell$} +(4, 0);
+  \draw[thin,gray] (0, 0) -- +(-0.75, 0);
+  \draw[thin,gray] (0, 1) -- +(-0.75, -0);
+  \draw[<->,gray] (-0.65, 0) -- node[fill=white,sloped]{$\ell$} +(0, 1);
+
+   \draw[thick,-latex] (0,0) -- +(0.5, 0) node[below]{$\v e_1$};
+   \draw[thick,-latex] (0,0) -- +(0, 0.5) node[right]{$\v e_2$};
+  }
+  
+  \onslide<1>{
+  \foreach \y in {0.0, 0.25, 0.5,..., 1.0}
+   \draw[-latex] (4.0, \y) -- +(0.5, -0.05);  
+   \node at (4.5, 1.0) [right,xshift=0.1cm]{$\v t^p$};
+  }
+
+ \onslide<1>{
+  \fill[pattern=north west lines, pattern color=black] (0, -0.25) rectangle +(-0.25, 1.5);
+  \draw[thick] (0, -0.25) -- +(0, 1.5);
+  }
+  \end{scope}
+  
+  \onslide<1>{\node at (-1.0, -2.5) [right]{\parbox{3cm}{$E = 200 \, \mathrm{GPa}$ \\ $\nu = 0.3$ \\ $\rho = 8000 \, \frac{\mathrm{kg}}{\mathrm{m}^3}$ \\ $\ell = 0.1\,\mathrm{m}$}};}
+  \onslide<1>{\node at (2.2, -2.5) [right]{\parbox{3cm}{$\boldsymbol{u}_0 = \boldsymbol{0}$ \\ $\boldsymbol{v}_0 = \boldsymbol{0}$}};}
+%   \onslide<2-4>{\node at (0, -0.4) [right,font=\footnotesize]{$\v u$ scaled with a factor of $1000$};}
+  
+  \onslide<1>{
+   \begin{axis}[xshift=5cm, yshift=-3.4cm, height=3cm, width=5cm, font=\footnotesize, 
+    axis y line=left, axis x line=bottom, xlabel=$t$, ylabel=$\vert \boldsymbol{t}^p \vert$, 
+    xlabel style={at={(current axis.right of origin)}, xshift=1.0ex, anchor=center},
+    ylabel style={at={(current axis.above origin)}, rotate=-90, yshift=1.0ex, anchor=center},
+    xmin=0, xmax=4, xtick={1,3}, xticklabels={$T/3$, $T\!=\!3\mathrm{ms}$},
+    ymin=0, ymax=1.5, ymajorticks=false,
+    clip=false]
+    \addplot[black,thick,no markers] coordinates {
+      (0, 0)
+      (1, 1)
+      (1, 0)
+      (3, 0)
+     };
+     \fill (axis cs:1,1) circle (1.5pt) node [above right,yshift=-3mm]{$[t^p_i] = \begin{bmatrix} 1 \\ -0.1 \end{bmatrix} \mathrm{MPa}$};
+   \end{axis}
+  
+  }
+  
+  \end{tikzpicture}
+  \end{center}
+
+ \end{overlayarea}
+\end{frame}
+
+
+
+
+\begin{frame}
+ \frametitle{Demo 5-2 $\vert$ \bfseries Elasto-dynamics}
+ \framesubtitle{\bfseries eigenmodes}
+ \begin{overlayarea}{0.9\textwidth}{0.9\textheight}
+%   \vspace*{3ex}
+ \begin{center}
+ \begin{tikzpicture}
+  \begin{scope}[scale=1.8]
+  \onslide<1>{
+  \fill[gray!10, draw=black] (0, 1) rectangle (4, 0) node[above left, black]{$\mathcal{B}$};
+  }
+
+  \onslide<1>{
+  \draw[thin,gray] (0, 0) -- +(0, -0.5);
+  \draw[thin,gray] (4, 0) -- +(0, -0.5);
+  \draw[<->,thin,gray] (0, -0.4) -- node[fill=white]{$4 \ell$} +(4, 0);
+  \draw[thin,gray] (0, 0) -- +(-0.75, 0);
+  \draw[thin,gray] (0, 1) -- +(-0.75, -0);
+  \draw[<->,gray] (-0.65, 0) -- node[fill=white,sloped]{$\ell$} +(0, 1);
+
+   \draw[thick,-latex] (0,0) -- +(0.5, 0) node[below]{$\v e_1$};
+   \draw[thick,-latex] (0,0) -- +(0, 0.5) node[right]{$\v e_2$};
+  }
+  
+%   
+%   \onslide<1>{
+%   \foreach \y in {0.0, 0.25, 0.5,..., 1.0}
+%    \draw[-latex] (4.0, \y) -- +(0.5, -0.05);  
+%    \node at (4.5, 1.0) [right,xshift=0.1cm]{$\v t^p$};
+%   }
+
+ \onslide<1>{
+  \fill[pattern=north west lines, pattern color=black] (0, -0.25) rectangle +(-0.25, 1.5);
+  \draw[thick] (0, -0.25) -- +(0, 1.5);
+  }
+  \end{scope}  
+  \onslide<1>{\node at (-1.0, -2.5) [right]{\parbox{3cm}{$E = 200 \, \mathrm{GPa}$ \\ $\nu = 0.3$ \\ $\rho = 8000 \, \frac{\mathrm{kg}}{\mathrm{m}^3}$ \\ $\ell = 0.1\,\mathrm{m}$}};}
+  \onslide<1>{\node at (2.2, -2.5) [right]{\parbox{7cm}{$\boldsymbol{u}_0 = \text{``eigenvector''}$ \\ $\boldsymbol{v}_0 = \boldsymbol{0}$}};}
+%   \onslide<1>{\node at (1.5, -2) [right]{$[t^p_i] = \begin{bmatrix} 1 \\ -0.1 \end{bmatrix} \mathrm{MPa}$};}
+%   \onslide<2-4>{\node at (0, -0.4) [right,font=\footnotesize]{$\v u$ scaled with a factor of $1000$};}
+  
+%   \onslide<1>{
+%    \begin{axis}[xshift=4cm, yshift=-3.5cm, height=3cm, width=5cm, font=\footnotesize, 
+%     axis y line=left, axis x line=bottom, xlabel=$t$, ylabel=$\vert \boldsymbol{t}^p \vert$, 
+%     xlabel style={at={(current axis.right of origin)}, xshift=1.0ex, anchor=center},
+%     ylabel style={at={(current axis.above origin)}, rotate=-90, yshift=1.0ex, anchor=center},
+%     xmin=0, xmax=4, xtick={1,3}, xticklabels={$T/3$, $T\!=\!10\mathrm{ms}$},
+%     ymin=0, ymax=1.5, ymajorticks=false,
+%     clip=false]
+%     \addplot[black,thick,no markers] coordinates {
+%       (0, 0)
+%       (1, 1)
+%       (1, 0)
+%       (3, 0)
+%      };
+%      \fill (axis cs:1,1) circle (1.5pt) node [above right,yshift=-3mm]{$[t^p_i] = \begin{bmatrix} 1 \\ -0.1 \end{bmatrix} \mathrm{MPa}$};
+%    \end{axis}
+%   
+%   }
+  
+  \end{tikzpicture}
+  \end{center}
+
+ \end{overlayarea}
+\end{frame}

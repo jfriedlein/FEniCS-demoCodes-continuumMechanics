@@ -24,7 +24,7 @@ nm_gamma = 0.5
 
 # Define geometry and mesh
 p_llb = Point(0.0, 0.0, 0.0)
-p_rtf = Point(0.04, 0.01, 0.01)
+p_rtf = Point(0.4, 0.1, 0.1)
 mesh = RectangleMesh(p_llb, p_rtf, 32, 8)
 #mesh = BoxMesh(p_llb, p_rtf, 4, 1, 1)
 
@@ -63,7 +63,7 @@ v_pred = Function(V)
 
 # Material parameters
 E = 200.e9
-nu = 0.45
+nu = 0.3
 mu    = E/(2.0*(1.0 + nu))
 lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu))
 #mu    = E/(2.0*(1.0 + nu)) #PLANE STRESS
@@ -112,9 +112,9 @@ for i in range(0, M.size(0)):
 j = int(input("Enter number of eigenvalue: "))
 
 r, c, rx, cx = eigensolver.get_eigenpair(j)
-u_n.vector()[:] = rx/norm(rx, "linf")*0.01*0.5
+u_n.vector()[:] = rx/norm(rx, "linf")*0.1*0.5
 
-T = 2*pi/sqrt(r)
+T = 2*2*pi/sqrt(r)
 dt = T / num_steps
 
 dirname = "ev"+str(j)+"/"

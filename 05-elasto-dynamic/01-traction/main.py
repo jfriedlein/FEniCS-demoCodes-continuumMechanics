@@ -8,7 +8,7 @@ parameters["form_compiler"]["optimize"] = True
 
 # Time definitions
 t = 0.0
-T = 0.003
+T = 0.01
 num_steps = 300
 dt = T / num_steps
 
@@ -23,7 +23,7 @@ nm_gamma = 0.5
 
 # Define geometry and mesh
 p_llb = Point(0.0, 0.0, 0.0)
-p_rtf = Point(0.04, 0.01, 0.01)
+p_rtf = Point(0.4, 0.1, 0.1)
 mesh = RectangleMesh(p_llb, p_rtf, 20, 5)
 #mesh = BoxMesh(p_llb, p_rtf, 4, 1, 1)
 
@@ -62,7 +62,7 @@ v_pred = Function(V)
 
 # Material parameters
 E = 200.e9
-nu = 0.45
+nu = 0.3
 mu    = E/(2.0*(1.0 + nu))
 lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu))
 #mu    = E/(2.0*(1.0 + nu)) #PLANE STRESS
@@ -74,7 +74,7 @@ g = 9.81
 # Volume force/ heat source and prescribed tractions
 #b = as_vector((0.0, -rho*g))
 b = Constant((0.0, 0.0))
-t_p = Expression(('(t<1.0*t1)?1.0*(-m/t1*fabs(t-t1)+m):0.0', '(t<1.0*t1)?-0.1*(-m/t1*fabs(t-t1)+m):0.0'), degree=2, t1=0.333*T, m=1.e6, t=0)
+t_p = Expression(('(t<1.0*t1)?1.0*(-m/t1*fabs(t-t1)+m):0.0', '(t<1.0*t1)?-0.1*(-m/t1*fabs(t-t1)+m):0.0'), degree=1, t1=0.3333*T, m=1.e6, t=0)
 
 # Prescribed Dirichlet boundary data
 #u_p = Expression(('m*t', '0.0', '0.0'), degree=1, m=-0.2/T, t=0)
