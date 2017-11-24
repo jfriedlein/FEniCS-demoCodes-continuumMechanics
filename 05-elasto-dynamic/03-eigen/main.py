@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 from dolfin import *
+from os import path, mkdir
 
 parameters["form_compiler"]["cpp_optimize"] = True
 parameters["form_compiler"]["optimize"] = True
@@ -23,8 +24,8 @@ nm_gamma = 0.5
 
 # Define geometry and mesh
 p_llb = Point(0.0, 0.0, 0.0)
-p_rtf = Point(0.05, 0.01, 0.01)
-mesh = RectangleMesh(p_llb, p_rtf, 25, 5)
+p_rtf = Point(0.04, 0.01, 0.01)
+mesh = RectangleMesh(p_llb, p_rtf, 20, 5)
 #mesh = BoxMesh(p_llb, p_rtf, 4, 1, 1)
 
 # Define boundaries
@@ -111,11 +112,13 @@ for i in range(0, M.size(0)):
 j = int(input("Enter number of eigenvalue: "))
 
 r, c, rx, cx = eigensolver.get_eigenpair(j)
-u_n.vector()[:] = rx/norm(rx, "linf")*0.01
+u_n.vector()[:] = rx/norm(rx, "linf")*0.01*0.5
 
 T = 2*pi/sqrt(r)
 dt = T / num_steps
 
+dirname = "ev"+str(j)+"/"
+mkdir(dirname)
 
 ################################
 #### WEAK FORM (+NEWMARK) ######
@@ -143,10 +146,10 @@ stress_n = project(sigma(u_n)/1.e6, Z, solver_type="mumps")
 	
 # Create output files
 u_n.rename("u","displacement")
-file_u = File("displacement.pvd", "compressed")
+file_u = File(dirname+"displacement.pvd", "compressed")
 file_u << (u_n, t)
 stress_n.rename("sigma","stress")
-file_stress = File("stress.pvd", "compressed")
+file_stress = File(dirname+"stress.pvd", "compressed")
 file_stress << (stress_n, t)
 
 ################################
