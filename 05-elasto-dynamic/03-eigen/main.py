@@ -10,7 +10,7 @@ parameters["form_compiler"]["optimize"] = True
 # Time definitions
 t = 0.0
 #T = 0.005
-num_steps = 100
+num_steps = 200
 #dt = T / num_steps
 
 #Parameters for Newmark (Average acceleration)
@@ -114,7 +114,7 @@ j = int(input("Enter number of eigenvalue: "))
 r, c, rx, cx = eigensolver.get_eigenpair(j)
 u_n.vector()[:] = rx/norm(rx, "linf")*0.1*0.5
 
-T = 2*2*pi/sqrt(r)
+T = 4*2*pi/sqrt(r)
 dt = T / num_steps
 
 dirname = "ev"+str(j)+"/"
