@@ -6,6 +6,7 @@
 *.snm
 *.backup
 *.toc
+*.synctex.gz
 *.pdf
 
 *.vtu
