@@ -38,7 +38,7 @@
 \renewcommand{\v}[1]{\boldsymbol{#1}}
 
 \pgfplotsset{compat=newest}
-\pgfplotsset{verticalbar/.style={
+\pgfplotsset{stressbar/.style={
     xmin=0.0,xmax=0.1,ymin=0.0,ymax=0.1,
 %     xshift=3.5cm,yshift=1.3cm,scale=0.4,
     hide axis,
@@ -63,6 +63,50 @@
     },
   }
 }
+
+\pgfplotsset{thermobar/.style={
+    xmin=0.0,xmax=0.1,ymin=0.0,ymax=0.1,
+%     xshift=3.5cm,yshift=1.3cm,scale=0.4,
+    hide axis,
+    scale only axis,
+    height=0,
+    width=0,
+    title style={anchor=south west, font=\normalsize},
+    colormap={}{
+      rgb=(0.229806,0.298718,0.753683) 
+      rgb=(0.303869,0.406535,0.844959) 
+      rgb=(0.383013,0.509419,0.917388) 
+      rgb=(0.466667,0.604563,0.968155) 
+      rgb=(0.552953,0.688929,0.995376) 
+      rgb=(0.639176,0.759600,0.998151) 
+      rgb=(0.722193,0.813953,0.976575) 
+      rgb=(0.798692,0.849786,0.931689) 
+      rgb=(0.865395,0.865410,0.865396) 
+      rgb=(0.924128,0.827385,0.774509) 
+      rgb=(0.958853,0.769768,0.678008) 
+      rgb=(0.969954,0.694267,0.579375) 
+      rgb=(0.958003,0.602842,0.481776) 
+      rgb=(0.923945,0.497309,0.387970) 
+      rgb=(0.869187,0.378313,0.300267) 
+      rgb=(0.795632,0.241284,0.220526) 
+      rgb=(0.705673,0.015556,0.150233) 
+    },     
+    colorbar,% sampled,
+    colorbar style={
+ 	font=\footnotesize,
+% 	samples=16,
+	scaled y ticks=false,
+	/pgf/number format/fixed,
+	extra y ticks={\pgfkeysvalueof{/pgfplots/ymin},\pgfkeysvalueof{/pgfplots/ymax}},
+	extra y tick style={yticklabel style={xshift=-0.7em, anchor=east}},
+        height=3cm,
+        width=0.3cm,
+        xshift=-1.0cm,
+        yshift=0cm
+    },
+  }
+}
+
 % \pgfplotsset{horizontalbar/.style={
 %     hide axis,
 %     scale only axis,
@@ -83,10 +127,10 @@
 
 \begin{document}
 
-% \input{../01-elasto-static/slides.tex}
-% \input{../02-thermo-static/slides.tex}
-% \input{../03-thermo-elasto-static/slides.tex}
-% \input{../04-lshape/slides.tex}
+\input{../01-elasto-static/slides.tex}
+\input{../02-thermo-static/slides.tex}
+\input{../03-thermo-elasto-static/slides.tex}
+\input{../04-lshape/slides.tex}
 \input{../05-elasto-dynamic/slides.tex}
 
 \end{document}

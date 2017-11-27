@@ -64,30 +64,11 @@
   \onslide<2>{
   \node at(1.5,0.5) {\includegraphics[width=6cm]{../02-thermo-static/01-heatsource/plot.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=0.0,point meta max=36.0,title={$\theta$ in $^\circ\mathrm{C}$}] 
+   \begin{axis}[thermobar,point meta min=0.0,point meta max=36.0,title={$\theta$ in $^\circ\mathrm{C}$}] 
     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
-%   \onslide<3>{
-%   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_22.png}};
-%   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
-%    \begin{axis}[verticalbar,point meta min=-1.87,point meta max=5.09,title={$\sigma_{22}$ in $\mathrm{MPa}$}] 
-%     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
-%   \end{scope}   
-%   }
-%   \onslide<4>{
-%   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_12.png}};
-%   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
-%    \begin{axis}[verticalbar,point meta min=-3.75,point meta max=0.02,title={$\sigma_{12}$ in $\mathrm{MPa}$}] 
-%     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
-%   \end{scope}   
-%   }
 
-%   \begin{scope}
-%    \onslide<1>{\node at (0, -1) [right]{\parbox{3cm}{$\kappa = 1.0 \, \mathrm{GPa}$ \\ $\ell = 0.1\,\mathrm{m}$}};}
-%    \onslide<1>{\node at (1.5, -1) [right]{\parbox{6cm}{$r = \alpha\,\exp(\vert \v x - \v x_0 \vert^2/\beta)$ \\ $$ on $\partial \mathcal{B}^t_\text{right}$}};}
-%    \onslide<2-4>{\node at (0, -0.5) [right,font=\footnotesize]{$\v u$ scaled with a factor of $5000$};}
-%   \end{scope}  
   \end{tikzpicture}
   \end{center}
   
@@ -161,7 +142,7 @@
   \onslide<2>{
   \node at(1.5,0.5) {\includegraphics[width=6cm]{../02-thermo-static/02-wall/plot.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-10.0,point meta max=25.0,title={$\theta$ in $^\circ\mathrm{C}$}] 
+   \begin{axis}[thermobar,point meta min=-10.0,point meta max=25.0,title={$\theta$ in $^\circ\mathrm{C}$}] 
     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
@@ -171,26 +152,6 @@
   \draw[dashed] (2.0, 0.0) -- +(0.0, 1.0);
   }
 
-%   \onslide<3>{
-%   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_22.png}};
-%   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
-%    \begin{axis}[verticalbar,point meta min=-1.87,point meta max=5.09,title={$\sigma_{22}$ in $\mathrm{MPa}$}] 
-%     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
-%   \end{scope}   
-%   }
-%   \onslide<4>{
-%   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_12.png}};
-%   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
-%    \begin{axis}[verticalbar,point meta min=-3.75,point meta max=0.02,title={$\sigma_{12}$ in $\mathrm{MPa}$}] 
-%     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
-%   \end{scope}   
-%   }
-
-%   \begin{scope}
-%    \onslide<1>{\node at (0, -1) [right]{\parbox{3cm}{$\kappa = 1.0 \, \mathrm{GPa}$ \\ $\ell = 0.1\,\mathrm{m}$}};}
-%    \onslide<1>{\node at (1.5, -1) [right]{\parbox{6cm}{$r = \alpha\,\exp(\vert \v x - \v x_0 \vert^2/\beta)$ \\ $$ on $\partial \mathcal{B}^t_\text{right}$}};}
-%    \onslide<2-4>{\node at (0, -0.5) [right,font=\footnotesize]{$\v u$ scaled with a factor of $5000$};}
-%   \end{scope}  
   \end{tikzpicture}
   \end{center}
    

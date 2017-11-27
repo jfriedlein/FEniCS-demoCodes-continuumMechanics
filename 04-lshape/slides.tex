@@ -35,11 +35,11 @@
   \onslide<6-7>{\node at(0.5,0.5) {\includegraphics[width=3.5cm]{../04-lshape/stress12.png}};}
 %     \draw (0, 0) -- (1, 0) node[above left, black]{$\mathcal{B}$} -- (1, 0.5) -- (0.5, 0.5) -- (0.5, 1.0) -- (0, 1.0) -- cycle;
   \begin{scope}[xshift=2.0cm,yshift=1.0cm,scale=0.3]
-   \onslide<2-3>{\begin{axis}[verticalbar,point meta min=-4.2,point meta max=47.1,title={$\sigma_{11}$ in $\mathrm{MPa}$}] 
+   \onslide<2-3>{\begin{axis}[stressbar,point meta min=-4.2,point meta max=47.1,title={$\sigma_{11}$ in $\mathrm{MPa}$}] 
     \addplot [draw=none] coordinates {(0,0)}; \end{axis}}
-   \onslide<4-5>{\begin{axis}[verticalbar,point meta min=-4.2,point meta max=47.1,title={$\sigma_{22}$ in $\mathrm{MPa}$}] 
+   \onslide<4-5>{\begin{axis}[stressbar,point meta min=-4.2,point meta max=47.1,title={$\sigma_{22}$ in $\mathrm{MPa}$}] 
     \addplot [draw=none] coordinates {(0,0)}; \end{axis}}
-   \onslide<6-7>{\begin{axis}[verticalbar,point meta min=-23.0,point meta max=3.0,title={$\sigma_{12}$ in $\mathrm{MPa}$}] 
+   \onslide<6-7>{\begin{axis}[stressbar,point meta min=-23.0,point meta max=3.0,title={$\sigma_{12}$ in $\mathrm{MPa}$}] 
     \addplot [draw=none] coordinates {(0,0)}; \end{axis}}
   \end{scope}
 

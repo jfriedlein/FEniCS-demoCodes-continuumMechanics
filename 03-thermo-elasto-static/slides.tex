@@ -35,14 +35,14 @@
   \onslide<2>{
   \node at(1.5,0.55) {\includegraphics[width=6cm]{../03-thermo-elasto-static/01-sunshine/theta.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-6.16,point meta max=6.16,title={$\theta - \theta_0$ in $\mathrm{K}$}] 
+   \begin{axis}[thermobar,point meta min=-6.16,point meta max=6.16,title={$\theta - \theta_0$ in $\mathrm{K}$}] 
     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
   \onslide<3>{
   \node at(1.5,0.55) {\includegraphics[width=6cm]{../03-thermo-elasto-static/01-sunshine/stress.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-50.2,point meta max=50.2,title={$\sigma_{11}$ in $\mathrm{MPa}$}] 
+   \begin{axis}[stressbar,point meta min=-50.2,point meta max=50.2,title={$\sigma_{11}$ in $\mathrm{MPa}$}] 
     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
@@ -123,7 +123,7 @@
   \onslide<2>{
   \node at(2,-0.15) {\includegraphics[width=8cm]{../03-thermo-elasto-static/02-bimetal/stress.png}};
   \begin{scope}[xshift=4cm,yshift=0.8cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-110,point meta max=67,title={$\sigma_{11}$ in $\mathrm{MPa}$}] 
+   \begin{axis}[stressbar,point meta min=-110,point meta max=67,title={$\sigma_{11}$ in $\mathrm{MPa}$}] 
     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }

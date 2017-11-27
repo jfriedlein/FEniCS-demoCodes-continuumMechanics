@@ -33,21 +33,21 @@
   \onslide<2>{
   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_11.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-7.2,point meta max=10.3,title={$\sigma_{11}$ in $\mathrm{MPa}$}] 
+   \begin{axis}[stressbar,point meta min=-7.2,point meta max=10.3,title={$\sigma_{11}$ in $\mathrm{MPa}$}] 
     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
   \onslide<3>{
   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_22.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-1.87,point meta max=5.09,title={$\sigma_{22}$ in $\mathrm{MPa}$}] 
+   \begin{axis}[stressbar,point meta min=-1.87,point meta max=5.09,title={$\sigma_{22}$ in $\mathrm{MPa}$}] 
     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
   \onslide<4>{
   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_12.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.3cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-3.75,point meta max=0.02,title={$\sigma_{12}$ in $\mathrm{MPa}$}] 
+   \begin{axis}[stressbar,point meta min=-3.75,point meta max=0.02,title={$\sigma_{12}$ in $\mathrm{MPa}$}] 
     \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
@@ -75,7 +75,7 @@
 % \begin{frame}
 %  \begin{tikzpicture}
 %    \node at(0,0) {\includegraphics[width=6cm]{../01-elasto-static/01-tractions/plot_11.png}};
-%    \begin{axis}[verticalbar,point meta min=-7.2,point meta max=10.3] \addplot [draw=none] coordinates {(0,0)}; \end{axis}
+%    \begin{axis}[stressbar,point meta min=-7.2,point meta max=10.3] \addplot [draw=none] coordinates {(0,0)}; \end{axis}
 %    \draw (0, 0) node[above right, xshift=0cm,yshift=0cm]{$\sigma_{11}$ in $\mathrm{MPa}$};
 %  \end{tikzpicture}
 % \end{frame}
@@ -115,21 +115,21 @@
   \onslide<2>{
   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/02-gravity/plot_11.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-4.04,point meta max=3.94,title={$\sigma_{11}$ in $\mathrm{MPa}$}]
+   \begin{axis}[stressbar,point meta min=-4.04,point meta max=3.94,title={$\sigma_{11}$ in $\mathrm{MPa}$}]
    \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
   \onslide<3>{
   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/02-gravity/plot_22.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-0.774,point meta max=1.6,title={$\sigma_{22}$ in $\mathrm{MPa}$}]
+   \begin{axis}[stressbar,point meta min=-0.774,point meta max=1.6,title={$\sigma_{22}$ in $\mathrm{MPa}$}]
    \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
   \onslide<4>{
   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/02-gravity/plot_12.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-0.0209,point meta max=0.02,title={$\sigma_{12}$ in $\mathrm{MPa}$}]
+   \begin{axis}[stressbar,point meta min=-0.0209,point meta max=0.02,title={$\sigma_{12}$ in $\mathrm{MPa}$}]
    \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
@@ -191,21 +191,21 @@
  \onslide<2>{
   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/03-rotation/plot_11.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-511,point meta max=440,title={$\sigma_{11}$ in $\mathrm{MPa}$}]
+   \begin{axis}[stressbar,point meta min=-511,point meta max=440,title={$\sigma_{11}$ in $\mathrm{MPa}$}]
    \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
   \onslide<3>{
   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/03-rotation/plot_12.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-306,point meta max=306,title={$\sigma_{12}$ in $\mathrm{MPa}$}]
+   \begin{axis}[stressbar,point meta min=-306,point meta max=306,title={$\sigma_{12}$ in $\mathrm{MPa}$}]
    \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
   \onslide<4>{
   \node at(1.5,0.4) {\includegraphics[width=6cm]{../01-elasto-static/03-rotation/plot_13.png}};
   \begin{scope}[xshift=3.5cm,yshift=1.2cm,scale=0.5]
-   \begin{axis}[verticalbar,point meta min=-306,point meta max=306,title={$\sigma_{13}$ in $\mathrm{MPa}$}]
+   \begin{axis}[stressbar,point meta min=-306,point meta max=306,title={$\sigma_{13}$ in $\mathrm{MPa}$}]
    \addplot [draw=none] coordinates {(0,0)}; \end{axis}
   \end{scope}   
   }
