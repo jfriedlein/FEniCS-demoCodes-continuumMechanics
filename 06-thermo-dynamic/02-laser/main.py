@@ -7,7 +7,7 @@ import numpy as np
 # Time definitions
 t = 0.0
 T = 100
-num_steps = 500
+num_steps = 400
 dt = T / num_steps
 
 # Parameters Crank-Nicolson
@@ -64,7 +64,7 @@ cv = rho*40.0
 
 # Heat source and prescribed heat fluxes
 #r = Expression("1.0e6*sin(m*t)", m=2*pi/T, t=0, degree=1)
-r = Expression("1.0e6*exp(-((x[0]-rx)*(x[0]-rx)+(x[1]-ry)*(x[1]-ry))/0.001)*m*t", rx=0.0, ry=0.0, m=1/T, t=0.0, degree=4)
+r = Expression("1.0e7*exp(-((x[0]-x0)*(x[0]-x0)+(x[1]-y0)*(x[1]-y0))/0.001)*m*t", x0=0.25, y0=0.25, m=1/T, t=0.0, degree=4)
 #q_p = Expression("1.0e3*m*t", m=1/T, t=0, degree=1)
 #r = Constant(0.0)
 q_p = Constant(0.0)
@@ -110,9 +110,27 @@ for n in range(num_steps):
     #t_p.t = t
 #    r.rx = (p1[0]-p0[0])*t/(0.01*T)
 #    r.ry = (p1[1]-p0[1])*t/(0.01*T)
-    r.rx = 0.3*np.cos(2*pi*t/(0.3*T))+0.5
-    r.ry = 0.3*np.sin(2*pi*t/(0.4*T))+0.5
+
+    DT = T/16
     r.t = T
+    if t<DT:
+        t0 = t/DT
+        r.x0 = (1-t0)*0.25+t0*0.75
+    elif t<2*DT:
+        t0 = (t-DT)/DT
+        r.y0 = (1-t0)*0.25+t0*0.75
+    elif t<3*DT:
+        t0 = (t-2*DT)/DT
+        r.x0 = t0*0.25+(1-t0)*0.75
+    elif t<4*DT:
+        t0 = (t-3*DT)/DT
+        r.y0 = t0*0.25+(1-t0)*0.75
+    #elif t<6*DT:
+    #    pass
+    else:
+        r.m = 0
+    #r.rx = 0.3*np.cos(2*pi*t/(0.3*T))+0.5
+    #r.ry = 0.3*np.sin(2*pi*t/(0.4*T))+0.5
     #q_p.t = t
     
     # Define predictors
