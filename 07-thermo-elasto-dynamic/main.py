@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from __future__ import print_function
 from dolfin import *
@@ -15,33 +14,33 @@ cn_alpha = 0.5
 nm_beta = 0.25
 nm_gamma = 0.5
 
-
-
 ################################
 #### PROBLEM DEFINITION ########
 ################################
 
 # Define geometry and mesh
-p = Point(0.0, 0.0, 0.0)
-q = Point(0.2, 0.05, 0.1)
-mesh = BoxMesh(p, q, 20, 10, 10)
+pt0 = Point(0.0, 0.0, 0.0)
+pt1 = Point(0.4, 0.1, 0.1)
+mesh = BoxMesh(pt0, pt1, 20, 5, 5)
 
 # Define boundaries
 boundaries = FacetFunction("size_t", mesh)
 boundaries.set_all(0)
 left, right, bottom, top = 1, 2, 3, 4
-CompiledSubDomain("near(x[0], side) && on_boundary", side = p[0]).mark(boundaries, left)
-CompiledSubDomain("near(x[0], side) && on_boundary", side = q[0]).mark(boundaries, right)
-CompiledSubDomain("near(x[1], side) && on_boundary", side = p[1]).mark(boundaries, bottom)
-CompiledSubDomain("near(x[1], side) && on_boundary", side = q[1]).mark(boundaries, top)
+CompiledSubDomain("near(x[0], side) && on_boundary", side = pt0[0]).mark(boundaries, left)
+CompiledSubDomain("near(x[0], side) && on_boundary", side = pt1[0]).mark(boundaries, right)
+CompiledSubDomain("near(x[1], side) && on_boundary", side = pt0[1]).mark(boundaries, bottom)
+CompiledSubDomain("near(x[1], side) && on_boundary", side = pt1[1]).mark(boundaries, top)
 
 # Coordinates and surface integral element
 x = SpatialCoordinate(mesh)
 ds = Measure('ds', domain=mesh, subdomain_data=boundaries)
 
 # Define function space
-P = VectorElement("Lagrange", mesh.ufl_cell(), 2, 3)
-Q = FiniteElement("Lagrange", mesh.ufl_cell(), 2)
+d = 3
+p = 2
+P = VectorElement("Lagrange", mesh.ufl_cell(), p, d)
+Q = FiniteElement("Lagrange", mesh.ufl_cell(), p)
 V = FunctionSpace(mesh, P*Q)
 
 # Define trial and test functions
@@ -68,18 +67,18 @@ v_pred = Function(V_u)
 theta_pred = Function(V_theta)
 
 # Material parameters
-rho = 1.0*conditional(x[1] < 0.5*q[1], 7874.0, 7140.0)
+rho = 1.0*conditional(x[1] < 0.5*pt1[1], 7874.0, 7140.0)
 g = 9.81
-E  = 1.0*conditional(x[1] < 0.5*q[1], 120.0e9, 92.0e9)
+E  = 1.0*conditional(x[1] < 0.5*pt1[1], 120.0e9, 92.0e9)
 nu = 0.3
 mu    = E/(2.0*(1.0 + nu))
 lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu))
-alpha = 1.0*conditional(x[1] < 0.5*q[1], 11.8e-6, 30.2e-6)
+alpha = 1.0*conditional(x[1] < 0.5*pt1[1], 11.8e-6, 30.2e-6)
 beta = alpha*E/(1-2.0*nu)
 theta0 = 273.0
-kappa = 1.0*conditional(x[1] < 0.5*q[1], 80.0, 112.0)
+kappa = 1.0*conditional(x[1] < 0.5*pt1[1], 80.0, 112.0)
 #cv = 461.0*rho#*conditional(x[1] < 0.5*q[1], 10.0, 1.0)
-cv = 1.0*rho*conditional(x[1] < 0.5*q[1], 449.0, 388.0)
+cv = 1.0*rho*conditional(x[1] < 0.5*pt1[1], 449.0, 388.0)
 
 # Volume force/ heat source and prescribed tractions/ prescribed heat fluxes
 #b = as_vector((0.0, -rho*g, 0.0))
@@ -100,7 +99,7 @@ bcs = [DirichletBC(V.sub(0), Constant((0.0, 0.0, 0.0)), boundaries, left),
     
 # Stress tensor (linear isotropic elasticity)
 def sigma(u, theta):
-    return lmbda*tr(sym(grad(u)))*Identity(3) + 2.0*mu*sym(grad(u)) - alpha*(3.0*lmbda + 2.0*mu)*Identity(3)*theta
+    return lmbda*tr(sym(grad(u)))*Identity(d) + 2.0*mu*sym(grad(u)) - alpha*(3.0*lmbda + 2.0*mu)*Identity(d)*theta
 
 # Newmark approximations for rates
 def a(u, u_pred):
@@ -121,22 +120,22 @@ F = rho*dot(delta_u, a(u, u_pred))*dx \
 
 # Project initial stress field
 def dev(s):
-	return s-tr(s)*Identity(3)/3.0
+	return s-tr(s)*Identity(d)/3.0
 def von_mises(s):
 	return sqrt(3.0/2.0*inner(dev(s), dev(s)))
-V_stress = FunctionSpace(mesh, "Lagrange", 1)
+V_stress = TensorFunctionSpace(mesh, "Lagrange", p)
 stress_n = Function(V_stress)
-stress_n.assign(project(von_mises(sigma(u_n, theta_n)), V_stress))
+stress_n = project(sigma(u_n, theta_n)/1.e6, V_stress, solver_type="mumps")
 
 # Create output files
-u_n.rename("u","displacement")
-file_u = File("thermoelasticitydynamic_newmark_displacement.pvd", "compressed")
+u_n.rename("u", "displacement")
+file_u = File("displacement.pvd", "compressed")
 file_u << (u_n, t)
 theta_n.rename("theta","temperature")
-file_theta = File("thermoelasticitydynamic_newmark_temperature.pvd", "compressed")
+file_theta = File("temperature.pvd", "compressed")
 file_theta << (theta_n, t)
 stress_n.rename("stress","vonMises")
-file_stress = File("thermoelasticitydynamic_newmark_stress.pvd", "compressed")
+file_stress = File("stress.pvd", "compressed")
 file_stress << (stress_n, t)
 
 
@@ -146,8 +145,12 @@ file_stress << (stress_n, t)
 ################################
 
 A = assemble(lhs(F))
-solver = LUSolver(A, 'mumps')
-solver.parameters['reuse_factorization'] = True
+[bc.apply(A) for bc in bcs]
+
+print("Setup solver...")
+solver = LUSolver(A, "mumps")
+solver.parameters["symmetric"] = True
+solver.parameters["reuse_factorization"] = True
 y = Function(V)
 
 # Time integration and function solving
@@ -167,7 +170,7 @@ for n in range(num_steps):
     
     # Assemble and solve
     b = assemble(rhs(F))
-    [bc.apply(A, b) for bc in bcs]
+    [bc.apply(b) for bc in bcs]
     solver.solve(y.vector(), b)
         
     # Update and correct functions
@@ -179,7 +182,7 @@ for n in range(num_steps):
     theta_n.vector()[:] = theta.vector()
     
     # Project stresses
-    stress_n.assign(project(von_mises(sigma(u_n, theta_n)), V_stress))
+    stress_n.assign(project(sigma(u_n, theta_n)/1.e6, V_stress, solver_type="mumps"))
     
     # Write step to files
     file_u << (u_n, t)
