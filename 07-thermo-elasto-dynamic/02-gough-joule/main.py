@@ -5,7 +5,7 @@ from dolfin import *
 
 # Time definitions
 t = 0.0
-T = 10.0
+T = 0.01
 num_steps = 100
 dt = T / num_steps
 
@@ -20,7 +20,7 @@ nm_gamma = 0.5
 
 # Define geometry and mesh
 pt0 = Point(0.0, 0.0, 0.0)
-pt1 = Point(0.4, 0.1, 0.1)
+pt1 = Point(1.0, 0.2, 0.2)
 mesh = RectangleMesh(pt0, pt1, 10, 5)
 
 # Define boundaries
@@ -53,11 +53,14 @@ V_theta = V.sub(1).collapse()
 
 # Interpolate initial displacement, velocity and temperature
 u_n = Function(V_u)
+#u_n.interpolate(Expression(("0.0", "x[0]*x[0]/l/l*0.1"), l=pt1[0], degree=1))
 u_n.interpolate(Constant((0.0, 0.0)))
 v_n = Function(V_u)
 v_n.interpolate(Constant((0.0, 0.0)))
+
+theta0 = 25.0
 theta_n = Function(V_theta)
-theta_n.interpolate(Constant(0.0))
+theta_n.interpolate(Constant(theta0))
 
 # Define additional rates and predictor functions for Newmark
 a_n = Function(V_u)
@@ -67,24 +70,26 @@ v_pred = Function(V_u)
 theta_pred = Function(V_theta)
 
 # Material parameters
-rho = 1.0*conditional(x[1] < 0.5*pt1[1], 7874.0, 7140.0)
-g = 9.81
-E  = 1.0*conditional(x[1] < 0.5*pt1[1], 120.0e9, 92.0e9)
+E = 200.e9
 nu = 0.3
 mu    = E/(2.0*(1.0 + nu))
 lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu))
-alpha = 1.0*conditional(x[1] < 0.5*pt1[1], 11.8e-6, 30.2e-6)
+#mu    = E/(2.0*(1.0 + nu)) #PLANE STRESS
+#lmbda = E*nu/((1.0 + nu)*(1.0 - nu)) #PLANE STRESS
+rho = 8.e3
+g = 9.81
+
+kappa = 80.0
+alpha = 1.e-6
 beta = alpha*E/(1-2.0*nu)
-theta0 = 273.0
-kappa = 1.0*conditional(x[1] < 0.5*pt1[1], 80.0, 112.0)
-#cv = 461.0*rho#*conditional(x[1] < 0.5*q[1], 10.0, 1.0)
-cv = 1.0*rho*conditional(x[1] < 0.5*pt1[1], 449.0, 388.0)
+cv = rho*500
 
 # Volume force/ heat source and prescribed tractions/ prescribed heat fluxes
 #b = as_vector((0.0, -rho*g, 0.0))
-b = Constant((0.0, 0.0, 0.0))
-t_p = Constant((0.0, 0.0, 0.0))
-r = Constant(1.0e6)
+b = Constant((0.0, 0.0))
+#t_p = Constant((0.0, 0.0))
+t_p = Expression(("0.0", "(t<1.0*t1)?1.0*(-m/t1*fabs(t-t1)+m):0.0"), degree=1, t1=0.1*T, m=1.e6, t=0)
+r = Constant(0.0)
 q_p = Constant(0.0)
 
 # Prescribed Dirichlet boundary data
@@ -95,7 +100,7 @@ q_p = Constant(0.0)
 bcs = [DirichletBC(V.sub(0), Constant((0.0, 0.0)), boundaries, left),
        #DirichletBC(V.sub(0), u_p, boundaries, right),
        #DirichletBC(V.sub(1), theta_p, boundaries, left)]#,
-       DirichletBC(V.sub(1), Constant(0.0), boundaries, left)]
+       DirichletBC(V.sub(1), Constant(theta0), boundaries, left)]
     
 # Stress tensor (linear isotropic elasticity)
 def sigma(u, theta):
@@ -149,7 +154,7 @@ A = assemble(lhs(F))
 
 print("Setup solver...")
 solver = LUSolver(A, "mumps")
-solver.parameters["symmetric"] = True
+#solver.parameters["symmetric"] = True
 solver.parameters["reuse_factorization"] = True
 y = Function(V)
 
@@ -161,6 +166,7 @@ for n in range(num_steps):
     # Update loads, boundary data, ...
     #u_p.t = t
     #theta_p.t = t
+    t_p.t = t
 
     # Define predictors
     u_pred.vector()[:] = u_n.vector()+dt*v_n.vector()\
