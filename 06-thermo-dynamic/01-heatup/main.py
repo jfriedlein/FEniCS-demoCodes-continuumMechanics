@@ -6,7 +6,7 @@ import numpy as np
 
 # Time definitions
 t = 0.0
-T = 600
+T = 3600
 num_steps = 200
 dt = T / num_steps
 
@@ -20,7 +20,7 @@ cn_alpha = 0.5
 # Define geometry and mesh
 d = 2
 p0 = Point(0.0, 0.0, 0.0)
-p1 = Point(0.5, 0.5, 0.1)
+p1 = Point(0.1, 0.1, 0.1)
 #mesh = BoxMesh(p0, p1, 20, 10, 10)
 mesh = RectangleMesh(p0, p1, 50, 50)
 
@@ -47,7 +47,7 @@ delta_theta = TestFunction(V)
 
 # Interpolate initial temperature
 theta_n = Function(V)
-theta_n.interpolate(Constant(0.0))
+theta_n.interpolate(Constant(25.0))
 #theta_n.interpolate(Expression("1.0e2*exp(-((x[0]-rx)*(x[0]-rx)+(x[1]-ry)*(x[1]-ry))/0.001)", rx=0.0, ry=0.5, degree=4))
 
 # Define additional rates and predictor functions for Newmark
@@ -58,22 +58,20 @@ theta_pred = Function(V)
 #rho = 1.0*conditional(x[1] < 0.5*p1[1], 7800.0, 7000.0)
 #kappa = 1.0*conditional(x[1] < 0.5*p1[1], 81.0, 121.0)
 #cv = 1.0*rho*conditional(x[1] < 0.5*p1[1], 452.0, 387.0)
-rho = 4500.0
-kappa = 6.6 #Metall (TiAl6V4)
-cv = rho*650.0
+rho = 8000.0
+kappa = 20.0
+cv = rho*500.0
 
 # Heat source and prescribed heat fluxes
 #r = Expression("1.0e6*sin(m*t)", m=2*pi/T, t=0, degree=1)
-r = Expression("1.0e8*exp(-((x[0]-x0)*(x[0]-x0)+(x[1]-y0)*(x[1]-y0))/0.001)*m*t", x0=0.125, y0=0.125, m=1/T, t=0.0, degree=4)
+#r = Expression("1.0e7*exp(-((x[0]-x0)*(x[0]-x0)+(x[1]-y0)*(x[1]-y0))/0.001)*m*t", x0=0.25, y0=0.25, m=1/T, t=0.0, degree=4)
 #q_p = Expression("1.0e3*m*t", m=1/T, t=0, degree=1)
-#r = Constant(0.0)
-q_p = Constant(0.0)
+r = Constant(0.0)
+q_p = Expression("x[1]*1.e5", degree=4)
+#q_p_bottom = Expression("x[0]<0.5 ? -1.e3*m*t : 0.0", m=1/T, t=0.0, degree=4)
 
 # Dirichlet boundary conditions
-bcs = [DirichletBC(V, Constant(0.0), boundaries, left),
-       DirichletBC(V, Constant(0.0), boundaries, right),
-       DirichletBC(V, Constant(0.0), boundaries, bottom),
-       DirichletBC(V, Constant(0.0), boundaries, top)]
+bcs = [DirichletBC(V, Constant(25.0), boundaries, left)]
 
 # Crank-N. approximations for rates
 def dtheta(th, th_pred):
@@ -82,7 +80,8 @@ def dtheta(th, th_pred):
 # Form definition (F(u, delta_u) = a(u, delta_u) - l(delta_u))
 F = cv*dtheta(theta, theta_pred)*delta_theta*dx \
 	+ kappa*dot(grad(delta_theta), grad(theta))*dx \
-	- r*delta_theta*dx - q_p*delta_theta*ds(top)
+	- r*delta_theta*dx \
+	- q_p*delta_theta*ds(right) # - q_p_bottom*delta_theta*ds(bottom)
 
 # Create output files
 theta_n.rename("theta","temperature")
@@ -114,29 +113,14 @@ for n in range(num_steps):
 #    r.rx = (p1[0]-p0[0])*t/(0.01*T)
 #    r.ry = (p1[1]-p0[1])*t/(0.01*T)
 
-    DT = T/16
-    L = p1[0]
-    DX = 0.25*L
-    r.t = T
-    if t<DT:
-        t0 = t/DT
-        r.x0 = (1-t0)*0.25*L+t0*0.75*L
-    elif t<2*DT:
-        t0 = (t-DT)/DT
-        r.y0 = (1-t0)*0.25*L+t0*0.75*L
-    elif t<3*DT:
-        t0 = (t-2*DT)/DT
-        r.x0 = t0*0.25*L+(1-t0)*0.75*L
-    elif t<4*DT:
-        t0 = (t-3*DT)/DT
-        r.y0 = t0*0.25*L+(1-t0)*0.75*L
-    #elif t<6*DT:
-    #    pass
-    else:
-        r.m = 0
     #r.rx = 0.3*np.cos(2*pi*t/(0.3*T))+0.5
     #r.ry = 0.3*np.sin(2*pi*t/(0.4*T))+0.5
+#    if t<0.5*T:
+#        q_p.s = t*2/T
+#    else:
+#        q_p.m = 1.0
     #q_p.t = t
+    #q_p_bottom.t = t
     
     # Define predictors
     theta_pred.vector()[:] = theta_n.vector()+dt*(1-cn_alpha)*dtheta_n.vector()
