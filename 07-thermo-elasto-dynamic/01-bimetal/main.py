@@ -8,7 +8,7 @@ parameters["form_compiler"]["optimize"] = True
 
 # Time definitions
 t = 0.0
-T = 1
+T = 10
 num_steps = 200
 dt = T / num_steps
 
