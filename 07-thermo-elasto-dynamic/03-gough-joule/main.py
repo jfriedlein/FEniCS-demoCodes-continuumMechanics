@@ -83,8 +83,8 @@ rho = 8.e3
 g = 9.81
 
 kappa = 80.0
-#alpha = 12.e-6
-alpha = 0.0
+alpha = 12.e-6
+#alpha = 0.0
 beta = alpha*E/(1-2.0*nu)
 cv = rho*400
 
@@ -133,18 +133,18 @@ F = rho*dot(delta_u, a(u, u_pred))*dx \
 	+ cv*dtheta(theta, theta_pred)*delta_theta*dx \
 	+ inner(grad(delta_u), sigma(u, theta))*dx \
 	+ kappa*dot(grad(delta_theta), grad(theta))*dx \
-	- dot(b, delta_u)*dx - dot(t_p, delta_u)*ds(right) #\
-	#+ theta0*beta*tr(sym(grad(v(u, u_pred, v_pred))))*delta_theta*dx \
-	#- r*delta_theta*dx - q_p*delta_theta*ds(right)
+    + theta0*beta*tr(sym(grad(v(u, u_pred, v_pred))))*delta_theta*dx \
+	- dot(b, delta_u)*dx - dot(t_p, delta_u)*ds(right) \
+	- r*delta_theta*dx - q_p*delta_theta*ds(right)
 
 # Project initial stress field
 def dev(s):
 	return s-tr(s)*Identity(d)/3.0
 def von_mises(s):
 	return sqrt(3.0/2.0*inner(dev(s), dev(s)))
-V_stress = TensorFunctionSpace(mesh, "Lagrange", p)
-stress_n = Function(V_stress)
-stress_n = project(sigma(u_n, theta_n)/1.e6, V_stress, solver_type="mumps")
+#V_stress = TensorFunctionSpace(mesh, "Lagrange", p)
+#stress_n = Function(V_stress)
+#stress_n = project(sigma(u_n, theta_n)/1.e6, V_stress, solver_type="mumps")
 
 # Create output files
 u_n.rename("u", "displacement")
@@ -153,9 +153,9 @@ file_u << (u_n, t)
 theta_n.rename("theta","temperature")
 file_theta = File("temperature.pvd", "compressed")
 file_theta << (theta_n, t)
-stress_n.rename("stress","vonMises")
-file_stress = File("stress.pvd", "compressed")
-file_stress << (stress_n, t)
+#stress_n.rename("stress","vonMises")
+#file_stress = File("stress.pvd", "compressed")
+#file_stress << (stress_n, t)
 
 
 ################################
@@ -201,10 +201,10 @@ for n in range(num_steps):
     theta_n.vector()[:] = theta.vector()
     
     # Project stresses
-    stress_n.assign(project(sigma(u_n, theta_n)/1.e6, V_stress, solver_type="mumps"))
+    #stress_n.assign(project(sigma(u_n, theta_n)/1.e6, V_stress, solver_type="mumps"))
     
     # Write step to files
     file_u << (u_n, t)
     file_theta << (theta_n, t)
-    file_stress << (stress_n, t)
+    #file_stress << (stress_n, t)
 
