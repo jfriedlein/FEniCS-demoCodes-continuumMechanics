@@ -164,3 +164,4 @@ for n in range(num_steps):
     # Write step to files
     file_u << (u_n, t)
     file_stress << (stress_n, t)
+    

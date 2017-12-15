@@ -8,7 +8,7 @@ parameters["form_compiler"]["optimize"] = True
 
 # Time definitions
 t = 0.0
-T = 10
+T = 0.001
 num_steps = 200
 dt = T / num_steps
 
@@ -23,8 +23,8 @@ nm_gamma = 0.5
 
 # Define geometry and mesh
 pt0 = Point(0.0, 0.0, 0.0)
-pt1 = Point(3.0, 1.0, 0.1)
-mesh = RectangleMesh(pt0, pt1, 30, 10)
+pt1 = Point(0.3, 0.1, 0.1)
+mesh = RectangleMesh(pt0, pt1, 100, 25)
 
 # Define boundaries
 boundaries = FacetFunction("size_t", mesh)
@@ -61,9 +61,9 @@ u_n.interpolate(Constant((0.0, 0.0)))
 v_n = Function(V_u)
 v_n.interpolate(Constant((0.0, 0.0)))
 
-theta0 = 273.0
+theta0 = 25.0
 theta_n = Function(V_theta)
-theta_n.interpolate(Constant(0))
+theta_n.interpolate(Constant(0.0))
 
 # Define additional rates and predictor functions for Newmark
 a_n = Function(V_u)
@@ -91,20 +91,19 @@ cv = rho*500
 #b = as_vector((0.0, -rho*g, 0.0))
 b = Constant((0.0, 0.0))
 t_p = Constant((0.0, 0.0))
-#t_p = Expression(('(t<1.0*t1)?1.0*(-m/t1*fabs(t-t1)+m):0.0', '(t<1.0*t1)?-0.1*(-m/t1*fabs(t-t1)+m):0.0'), degree=2, t1=0.001, m=1.e9, t=0)
+#t_p = Expression(("(t<1.0*t1)?1.0*(-m/t1*fabs(t-t1)+m):0.0", "0.0"), degree=2, t1=0.33*T, m=1.e9, t=0)
+#t_p = Expression(("(t<t1)?m:0.0", "0.0"), degree=2, t1=0.33*T, m=1.e9, t=0)
 r = Constant(0.0)
 q_p = Constant(0.0)
 
 # Prescribed Dirichlet boundary data
-u_p = Expression("u0", degree=1, u0=0.0)
+u_p = Expression(("0.03*sin(2*3.141*t/t0)", "0.0"), t=t, t0=T, degree=3)
 #theta_p = Expression(('m*t'), degree=1, m=100.0/T, t=0)
 
 # Dirichlet boundary conditions
-bcs = [DirichletBC(V.sub(0).sub(0), Constant(0.0), boundaries, left),
-       DirichletBC(V.sub(0).sub(1), Constant(0.0), boundaries, bottom),
-       #DirichletBC(V.sub(0), Constant((0.0, 0.0)), boundaries, left),
-       DirichletBC(V.sub(0).sub(0), u_p, boundaries, right),
-       #DirichletBC(V.sub(0).sub(1), u_p, boundaries, top),
+bcs = [DirichletBC(V.sub(0), Constant((0.0, 0.0)), boundaries, left),
+       DirichletBC(V.sub(0), u_p, boundaries, right),
+       #DirichletBC(V.sub(0).sub(0), u0, boundaries, right),
        #DirichletBC(V.sub(1), theta_p, boundaries, left)]#,
        #DirichletBC(V.sub(1), Constant(theta0), boundaries, right)
        ]
@@ -112,6 +111,46 @@ bcs = [DirichletBC(V.sub(0).sub(0), Constant(0.0), boundaries, left),
 # Stress tensor (linear isotropic elasticity)
 def sigma(u, theta):
     return lmbda*tr(sym(grad(u)))*Identity(d) + 2.0*mu*sym(grad(u)) - alpha*(3.0*lmbda + 2.0*mu)*Identity(d)*theta
+
+# Solve eigenvalues problem
+#V_eigen = V_u #VectorFunctionSpace(mesh, "Lagrange", p)
+#u_eigen = TrialFunction(V_eigen)
+#delta_u_eigen = TestFunction(V_eigen)
+#def sigma_eigen(u):
+#    return lmbda*tr(sym(grad(u)))*Identity(d) + 2.0*mu*sym(grad(u))
+#print("Assemble mass and stiffness matrix...")
+#m = rho*dot(delta_u_eigen, u_eigen)*dx
+#a = inner(grad(delta_u_eigen), sigma_eigen(u_eigen))*dx
+#M = PETScMatrix()
+#K = PETScMatrix()
+#assemble(m, tensor=M)
+#assemble(a, tensor=K)
+#DirichletBC(V_eigen, Constant((0.0, 0.0)), boundaries, left).apply(M)
+#DirichletBC(V_eigen, Constant((0.0, 0.0)), boundaries, left).apply(K)
+##[bc.apply(M) for bc in bcs]
+##[bc.apply(K) for bc in bcs]
+#print("Solve for eigenvalues...")
+#eigensolver = SLEPcEigenSolver(K, M)
+##eigensolver.parameters["problem_type"] = "gen_hermitian"
+#eigensolver.solve()
+#for i in range(0, M.size(0)):
+#	r, c, rx, cx = eigensolver.get_eigenpair(i)
+#	if r < 1.1:
+#		break
+#	print(" Eigenvalue ", i, " = +-i", sqrt(r))
+#
+#j = int(input("Enter number of eigenvalue: "))
+#
+#r, c, rx, cx = eigensolver.get_eigenpair(j)
+#u_n.vector()[:] = rx/norm(rx, "linf")*0.1*0.5
+#
+#T = num_steps/50*2*pi/sqrt(r)
+#dt = T / num_steps
+
+#dirname = "ev"+str(j)+"/"
+#if not path.exists(dirname):
+#	mkdir(dirname)
+
 
 # Newmark approximations for rates
 def a(u, u_pred):
@@ -127,8 +166,8 @@ F = rho*dot(delta_u, a(u, u_pred))*dx \
 	+ inner(grad(delta_u), sigma(u, theta))*dx \
 	+ kappa*dot(grad(delta_theta), grad(theta))*dx \
 	+ theta0*beta*tr(sym(grad(v(u, u_pred, v_pred))))*delta_theta*dx \
-	- dot(b, delta_u)*dx - dot(t_p, delta_u)*ds(top) \
-	- r*delta_theta*dx - q_p*delta_theta*ds(top)
+	- dot(b, delta_u)*dx - dot(t_p, delta_u)*ds(right) \
+	- r*delta_theta*dx - q_p*delta_theta*ds(right)
 
 # Project initial stress field
 def dev(s):
@@ -171,15 +210,10 @@ for n in range(num_steps):
     print("Step ", n, " (t=", t, ")", sep="")
     
     # Update loads, boundary data, ...
-    
+    u_p.t = t
     #theta_p.t = t
     #t_p.t = t
 
-    if t < T/2:
-        u_p.u0 = 1.0*t/(T/2)
-    else:
-        u_p.u0 = 1.0*(1-(t-T/2)/(T/2))
-        
 
     # Define predictors
     u_pred.vector()[:] = u_n.vector()+dt*v_n.vector()\

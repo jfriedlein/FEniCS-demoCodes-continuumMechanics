@@ -8,7 +8,7 @@ parameters["form_compiler"]["optimize"] = True
 
 # Time definitions
 t = 0.0
-T = 10
+T = 1
 num_steps = 200
 dt = T / num_steps
 
@@ -23,8 +23,8 @@ nm_gamma = 0.5
 
 # Define geometry and mesh
 pt0 = Point(0.0, 0.0, 0.0)
-pt1 = Point(3.0, 1.0, 0.1)
-mesh = RectangleMesh(pt0, pt1, 30, 10)
+pt1 = Point(0.03, 0.002, 0.005)
+mesh = RectangleMesh(pt0, pt1, 50, 10)
 
 # Define boundaries
 boundaries = FacetFunction("size_t", mesh)
@@ -56,14 +56,14 @@ V_theta = V.sub(1).collapse()
 
 # Interpolate initial displacement, velocity and temperature
 u_n = Function(V_u)
-#u_n.interpolate(Expression(("0.0", "x[0]*x[0]/l/l*0.1"), l=pt1[0], degree=1))
 u_n.interpolate(Constant((0.0, 0.0)))
+#u_n.interpolate(Expression(("0.0", "x[0]*x[0]/l/l*0.1"), l=pt1[0], degree=1))
 v_n = Function(V_u)
 v_n.interpolate(Constant((0.0, 0.0)))
 
 theta0 = 273.0
 theta_n = Function(V_theta)
-theta_n.interpolate(Constant(0))
+theta_n.interpolate(Constant(0.0))
 
 # Define additional rates and predictor functions for Newmark
 a_n = Function(V_u)
@@ -83,9 +83,9 @@ rho = 8.e3
 g = 9.81
 
 kappa = 80.0
-alpha = 1.e-6
+alpha = 1.0*conditional(lt(x[1], pt1[1]/2.0), 1.e-6, 15.0e-6)
 beta = alpha*E/(1-2.0*nu)
-cv = rho*500
+cv = rho*400
 
 # Volume force/ heat source and prescribed tractions/ prescribed heat fluxes
 #b = as_vector((0.0, -rho*g, 0.0))
@@ -96,18 +96,16 @@ r = Constant(0.0)
 q_p = Constant(0.0)
 
 # Prescribed Dirichlet boundary data
-u_p = Expression("u0", degree=1, u0=0.0)
-#theta_p = Expression(('m*t'), degree=1, m=100.0/T, t=0)
+#u_p = Expression("u0", degree=1, u0=0.0)
+theta_p = Expression(("t0+m*t"), degree=1, m=25.0/T, t0=0, t=0)
 
 # Dirichlet boundary conditions
-bcs = [DirichletBC(V.sub(0).sub(0), Constant(0.0), boundaries, left),
-       DirichletBC(V.sub(0).sub(1), Constant(0.0), boundaries, bottom),
-       #DirichletBC(V.sub(0), Constant((0.0, 0.0)), boundaries, left),
-       DirichletBC(V.sub(0).sub(0), u_p, boundaries, right),
-       #DirichletBC(V.sub(0).sub(1), u_p, boundaries, top),
-       #DirichletBC(V.sub(1), theta_p, boundaries, left)]#,
-       #DirichletBC(V.sub(1), Constant(theta0), boundaries, right)
-       ]
+bcs = [DirichletBC(V.sub(0), Constant((0.0, 0.0)), boundaries, left),
+       DirichletBC(V.sub(1), theta_p, boundaries, left),
+       DirichletBC(V.sub(1), theta_p, boundaries, right),
+       DirichletBC(V.sub(1), theta_p, boundaries, bottom),
+       DirichletBC(V.sub(1), theta_p, boundaries, top)
+      ]
     
 # Stress tensor (linear isotropic elasticity)
 def sigma(u, theta):
@@ -170,16 +168,10 @@ for n in range(num_steps):
     t += dt
     print("Step ", n, " (t=", t, ")", sep="")
     
-    # Update loads, boundary data, ...
-    
-    #theta_p.t = t
-    #t_p.t = t
-
-    if t < T/2:
-        u_p.u0 = 1.0*t/(T/2)
-    else:
-        u_p.u0 = 1.0*(1-(t-T/2)/(T/2))
-        
+    # Update loads, boundary data, ...    
+    theta_p.t = t
+    #if t > T/2:
+    #    theta_p.m = 0
 
     # Define predictors
     u_pred.vector()[:] = u_n.vector()+dt*v_n.vector()\
