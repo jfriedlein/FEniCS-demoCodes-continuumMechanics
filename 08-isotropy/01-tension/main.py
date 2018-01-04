@@ -33,13 +33,12 @@ u = TrialFunction(V)
 delta_u = TestFunction(V)
 
 # Material parameters
-
 E = 200.e9
 nu = 0.3
 mu    = E/(2.0*(1.0 + nu))
 lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu))
-##mu    = E/(2.0*(1.0 + nu)) #PLANE STRESS
-##lmbda = E*nu/((1.0 + nu)*(1.0 - nu)) #PLANE STRESS
+#mu    = E/(2.0*(1.0 + nu)) #PLANE STRESS
+#lmbda = E*nu/((1.0 + nu)*(1.0 - nu)) #PLANE STRESS
 
 #rho = 8.e3
 #g = 9.81
@@ -47,10 +46,7 @@ lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu))
 
 # Volume force/ heat source and prescribed tractions/ prescribed heat fluxes
 b = Constant((0.0, 0.0, 0.0))
-t_p = 50.0e6
-t_p_right = Constant((-t_p, 0.0, 0.0))
-t_p_top = Constant((0.0, -t_p, 0.0))
-t_p_front = Constant((0.0, 0.0, -t_p))
+t_p = Constant((0.0, 0.0, 0.0))
 
 # Dirichlet boundary conditions
 #class Near(SubDomain):
@@ -72,7 +68,8 @@ class AxisZ(SubDomain):
 						       
 bcs = [DirichletBC(V.sub(0), Constant(0.0), boundaries, left),
 	   DirichletBC(V.sub(1), Constant(0.0), boundaries, bottom),
-	   DirichletBC(V.sub(2), Constant(0.0), boundaries, back)
+	   DirichletBC(V.sub(2), Constant(0.0), boundaries, back),
+	   DirichletBC(V.sub(0), Constant(0.2), boundaries, right)
        ]
 
 # Stress tensor (linear isotropic elasticity)
@@ -91,10 +88,7 @@ def sigma(u):
 		   
 # Weak form a==l
 a = inner(grad(delta_u), sigma(u))*dx
-l = dot(b, delta_u)*dx \
-    + dot(t_p_right, delta_u)*ds(right) \
-    + dot(t_p_top, delta_u)*ds(top) \
-    + dot(t_p_front, delta_u)*ds(front)
+l = dot(b, delta_u)*dx + dot(t_p, delta_u)*ds(right)
 
 ################################
 #### ASSEMBLE AND SOLVE ########
