@@ -45,6 +45,8 @@ lmbda = (nu_LT*nu_TL+nu_TT)/(1-nu_TT-2*nu_LT*nu_TL)/(1+nu_TT)*E_T
 alpha = (nu_LT*(1+nu_TT-nu_TL)-nu_TT)/(1-nu_TT-2*nu_LT*nu_TL)/(1+nu_TT)*E_T
 beta = E_L*(1-nu_TT*nu_TT)/(1-nu_TT-2*nu_LT*nu_TL)/(1+nu_TT)-lmbda-4*mu_LT
 
+#a1 = Constant((1.0, 0.0, 0.0))
+#a1 = Constant((0.0, 1.0, 0.0))
 a1 = Constant((1.0/sqrt(2), 1.0/sqrt(2), 0.0))
 A1 = outer(a1, a1)
 
@@ -77,7 +79,7 @@ class AxisZ(SubDomain):
 bcs = [DirichletBC(V.sub(0), Constant(0.0), boundaries, left),
 	   DirichletBC(V.sub(1), Constant(0.0), AxisZ(), method="pointwise"),
 	   DirichletBC(V.sub(2), Constant(0.0), Origin(), method="pointwise"),
-	   DirichletBC(V.sub(0), Constant(0.1), boundaries, right)
+	   DirichletBC(V.sub(0), Constant(0.2), boundaries, right)
        ]
 
 # Stress tensor (linear isotropic elasticity)
@@ -134,4 +136,3 @@ stress = project(sigma(u)/1.e6, T, solver_type="cg", preconditioner_type="petsc_
 stress.rename("sigma", "stress")
 
 File("stress.pvd", "compressed") << stress
-
