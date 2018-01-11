@@ -8,7 +8,7 @@ from dolfin import *
 d = 3
 p0 = Point(0.0, 0.0, 0.0)
 p1 = Point(1.0, 1.0, 1.0)
-mesh = BoxMesh(p0, p1, 10, 10, 10)
+mesh = BoxMesh(p0, p1, 5, 5, 5)
 
 # Define boundaries
 boundaries = FacetFunction("size_t", mesh)
@@ -33,11 +33,11 @@ u = TrialFunction(V)
 delta_u = TestFunction(V)
 
 # Material parameters
-E_L = 45000  #=E_11
-E_T = 13500  #=E_22=E_33
+E_L = 44000*1.e6  #=E_11
+E_T = 13000*1.e6  #=E_22=E_33
 nu_LT = 0.25 #=nu=nu_12=nu_13
 nu_TT = 0.3  #=nu_23=nu_32
-mu_LT = 5600 #=G_12=G_13
+mu_LT = 5600*1.e6 #=G_12=G_13
 mu_TT = E_T/(2*(1+nu_TT)) #=G_23
 nu_TL = E_T/E_L*nu_LT
 
@@ -46,12 +46,12 @@ alpha = (nu_LT*(1+nu_TT-nu_TL)-nu_TT)/(1-nu_TT-2*nu_LT*nu_TL)/(1+nu_TT)*E_T
 beta = E_L*(1-nu_TT*nu_TT)/(1-nu_TT-2*nu_LT*nu_TL)/(1+nu_TT)-lmbda-4*mu_LT
 
 #a1 = Constant((1.0, 0.0, 0.0))
-#a1 = Constant((0.0, 1.0, 0.0))
-a1 = Constant((1.0/sqrt(2), 1.0/sqrt(2), 0.0))
+a1 = Constant((0.0, 1.0, 0.0))
+#a1 = Constant((1.0/sqrt(2), 1.0/sqrt(2), 0.0))
 A1 = outer(a1, a1)
 
-rho = 8.e3
-g = 9.81
+#rho = 8.e3
+#g = 9.81
 
 
 # Volume force/ heat source and prescribed tractions/ prescribed heat fluxes
@@ -79,7 +79,7 @@ class AxisZ(SubDomain):
 bcs = [DirichletBC(V.sub(0), Constant(0.0), boundaries, left),
 	   DirichletBC(V.sub(1), Constant(0.0), AxisZ(), method="pointwise"),
 	   DirichletBC(V.sub(2), Constant(0.0), Origin(), method="pointwise"),
-	   DirichletBC(V.sub(0), Constant(0.2), boundaries, right)
+	   DirichletBC(V.sub(0), Constant(0.02), boundaries, right)
        ]
 
 # Stress tensor (linear isotropic elasticity)
