@@ -2,11 +2,14 @@
 \begin{frame}
  \frametitle{Demo 8-1 $\vert$ \bfseries Transversal isotropy}
  \framesubtitle{\bfseries tension test of glass-fiber reinforced plastic}
+ \only<2>{\framesubtitle{\bfseries compliance matrix for \(\v a = \v e_1\)}}
+ \only<3>{\framesubtitle{\bfseries elasticity matrix for \(\v a = \v e_1\)}}
   \begin{overlayarea}{0.9\textwidth}{0.9\textheight}
- \vspace*{-3ex}
+ \vspace*{-5ex}
  \begin{center}
+ \hspace*{-1em}
  \begin{tikzpicture}[scale=3]
-
+ \onslide<1>{
  \fill[gray!10] (0, 1) rectangle (1, 0);
  \begin{scope}
   \clip (0, 1) rectangle (1, 0);
@@ -14,7 +17,6 @@
   \draw[gray!30,ultra thick,rotate=45] (-1, \y) -- +(3, 0);
  \end{scope} 
  \draw (0, 1) rectangle (1, 0) node[above left, black]{$\mathcal{B}$};
- 
 
   \draw[thin,gray] (0, 1) -- +(0, 0.2);
   \draw[thin,gray] (1, 1) -- +(0, 0.2);
@@ -44,26 +46,124 @@
 
 %   \fill[pattern=north west lines, pattern color=black] (3, -0.25) rectangle +(0.25, 1.5);
 %   \draw[thick] (3, -0.25) -- +(0, 1.5);
+  }
+  \onslide<2>{
+  \node at (-0.2, 0.6) [right]{\parbox{8cm}{
+ \[
+ \begin{bmatrix}
+  \varepsilon_{11} \\[1ex] \varepsilon_{22} \\[1ex] \varepsilon_{33} \\[1ex]
+  2\varepsilon_{23} \\[1ex] 2\varepsilon_{13} \\[1ex] 2\varepsilon_{12}
+ \end{bmatrix}
+ \!=\!
+ \begin{bmatrix}
+ \frac{1}{E_\parallel} & -\frac{\nu_{\parallel \perp}}{E_\parallel} & -\frac{\nu_{\parallel \perp}}{E_\parallel} & 0 & 0 & 0\\[1ex]
+ -\frac{\nu_{\parallel \perp}}{E_\parallel} & \frac{1}{E_\perp} & -\frac{\nu_{\perp \perp}}{E_\perp} & 0 & 0 & 0\\[1ex]
+ -\frac{\nu_{\parallel \perp}}{E_\parallel} & -\frac{\nu_{\perp \perp}}{E_\perp} & \frac{1}{E_\perp} & 0 & 0 & 0\\[1ex]
+ 0 & 0 & 0 & \frac{1}{\mu_{\perp \perp}} & 0 & 0 \\[1ex]
+ 0 & 0 & 0 & 0 & \frac{1}{\mu_{\parallel \perp}} & 0 \\[1ex]
+ 0 & 0 & 0 & 0 & 0 & \frac{1}{\mu_{\parallel \perp}}
+\end{bmatrix} 
+ \!
+ \begin{bmatrix}
+  \sigma_{11} \\[1ex] \sigma_{22} \\[1ex] \sigma_{33} \\[1ex]
+  \sigma_{23} \\[1ex] \sigma_{13} \\[1ex] \sigma_{12}
+ \end{bmatrix}
+\]
+   }};
+   
+   \node at (2.0, -0.2) [right,font=\footnotesize]{\parbox{4cm}{
+    \[
+     \text{with} \quad \nu_{\perp \perp} = \frac{E_\perp}{2 \mu_{\perp \perp}} - 1 = 0.3
+    \]
+   }};
+   
+  }
+ \onslide<3>{
+  \node at (-0.2, 0.7) [right,font=\footnotesize]{\parbox{8cm}{
+ \[
+ \begin{bmatrix}
+  \sigma_{11} \\[1ex] \sigma_{22} \\[1ex] \sigma_{33} \\[1ex]
+  \sigma_{23} \\[1ex] \sigma_{13} \\[1ex] \sigma_{12}
+ \end{bmatrix} 
+ \!=\!
+ \begin{bmatrix}
+ \frac{E_\parallel [1-\nu_{\!\perp \!\perp}^2]}{D} \! & \! \frac{E_{\!\perp} \nu_{\parallel \!\perp} [1+\nu_{\!\perp \!\perp}]}{D} \! & \! \frac{E_{\!\perp} \nu_{\parallel \!\perp} [1+\nu_{\!\perp \!\perp}]}{D} \! & \! 0 \! & \! 0 \! & \! 0\\[1ex]
+ \frac{E_{\!\perp} \nu_{\parallel \!\perp} [1+\nu_{\!\perp \!\perp}]}{D} \! & \! \frac{E_{\!\perp} [1-\nu_{\parallel \!\perp}\nu_{\!\perp \parallel}]}{D} \! & \! \frac{E_{\!\perp} [\nu_{\!\perp \!\perp}+\nu_{\parallel \!\perp}\nu_{\!\perp \parallel}]}{D} \! & \! 0 \! & \! 0 \! & \! 0\\[1ex]
+ \frac{E_{\!\perp} \nu_{\parallel \!\perp} [1+\nu_{\!\perp \!\perp}]}{D} \! & \! \frac{E_{\!\perp} [\nu_{\!\perp \!\perp}+\nu_{\parallel \!\perp}\nu_{\!\perp \parallel}]}{D} \! & \! \frac{E_{\!\perp} [1-\nu_{\parallel \!\perp}\nu_{\!\perp \parallel}]}{D} \! & \! 0 \! & \! 0 \! & \! 0\\[1ex]
+ 0 \! & \! 0 \! & \! 0 \! & \! \mu_{\!\perp \!\perp} \! & \! 0 \! & \! 0 \\[1ex]
+ 0 \! & \! 0 \! & \! 0 \! & \! 0 \! & \! \mu_{\parallel \!\perp} \! & \! 0 \\[1ex]
+ 0 \! & \! 0 \! & \! 0 \! & \! 0 \! & \! 0 \! & \! \mu_{\parallel \!\perp}
+\end{bmatrix}
+ \!
+\begin{bmatrix}
+  \varepsilon_{11} \\[1ex] \varepsilon_{22} \\[1ex] \varepsilon_{33} \\[1ex]
+  2\varepsilon_{23} \\[1ex] 2\varepsilon_{13} \\[1ex] 2\varepsilon_{12}
+ \end{bmatrix}
+\]
+   }};
+   
+ \node at (-0.2, -0.1) [right,font=\footnotesize]{\parbox{8cm}{
+ \[
+ \text{with }
+  D = [1+\nu_{\!\perp \!\perp}] [1 - \nu_{\!\perp \!\perp} - 2 \nu_{\parallel \!\perp} \nu_{\!\perp \parallel}] , \quad 
+  \nu_{\!\perp \!\perp} = \frac{E_{\!\perp}}{2 \mu_{\!\perp \!\perp}} - 1 = 0.3, \quad
+  \nu_{\!\perp \parallel} = \frac{E_{\!\perp}}{E_{\parallel}} \nu_{\parallel \!\perp} \approx 0.85
+ \]
+   }};   
+  }
   
+% 
+%  \onslide<4>{
+%   \node at (-0.2, 0.7) [right,font=\footnotesize]{\parbox{8cm}{
+%  \[
+%  \begin{bmatrix}
+%   \sigma_{11} \\[1ex] \sigma_{22} \\[1ex] \sigma_{33} \\[1ex]
+%   \sigma_{23} \\[1ex] \sigma_{13} \\[1ex] \sigma_{12}
+%  \end{bmatrix} 
+%  \!=\!
+%  \begin{bmatrix}
+%  E_{1111} \! & \! 2 \nu_{\parallel \!\perp} [\lambda+\mu_{\!\perp\!\perp}] \! & \! 2 \nu_{\parallel \!\perp} [\lambda+\mu_{\!\perp\!\perp}] \! & \! 0 \! & \! 0 \! & \! 0\\[1ex]
+%  2 \nu_{\parallel \!\perp} [\lambda+\mu_{\!\perp\!\perp}] \! & \! \lambda+2\mu_{\!\perp\!\perp} \! & \! \lambda \! & \! 0 \! & \! 0 \! & \! 0\\[1ex]
+%  2 \nu_{\parallel \!\perp} [\lambda+\mu_{\!\perp\!\perp}] \! & \! \lambda \! & \! \lambda+2\mu_{\!\perp\!\perp} \! & \! 0 \! & \! 0 \! & \! 0\\[1ex]
+%  0 \! & \! 0 \! & \! 0 \! & \! \mu_{\!\perp \!\perp} \! & \! 0 \! & \! 0 \\[1ex]
+%  0 \! & \! 0 \! & \! 0 \! & \! 0 \! & \! \mu_{\parallel \!\perp} \! & \! 0 \\[1ex]
+%  0 \! & \! 0 \! & \! 0 \! & \! 0 \! & \! 0 \! & \! \mu_{\parallel \!\perp}
+% \end{bmatrix}
+%  \!
+% \begin{bmatrix}
+%   \varepsilon_{11} \\[1ex] \varepsilon_{22} \\[1ex] \varepsilon_{33} \\[1ex]
+%   2\varepsilon_{23} \\[1ex] 2\varepsilon_{13} \\[1ex] 2\varepsilon_{12}
+%  \end{bmatrix}
+% \]
+%    }};
+%    
+%  \node at (-0.2, -0.1) [right,font=\footnotesize]{\parbox{8cm}{
+%  \[
+%  \text{with }
+%   E_{1111} = \frac{1 - \nu_{\!\perp \!\perp}}{1 - \nu_{\!\perp \!\perp} - 2 \nu_{\parallel \!\perp} \nu_{\!\perp \!\parallel}} E_{\parallel}, \quad
+%   \lambda = \frac{\nu_{\parallel \!\perp} \nu_{\perp \!\parallel} + \nu_{\!\perp \!\perp}}{[1 - \nu_{\!\perp \!\perp} - 2 \nu_{\parallel \!\perp} \nu_{\!\perp \!\parallel}][1+ \nu_{\!\perp \!\perp}]} E_{\!\perp}
+%  \]
+%    }};   
+%   }
   
-  \begin{scope}
-   \onslide<1>{\node at (-0.2, -0.9) [right]{\parbox{4cm}{
+  \onslide<1-3>{
+  \node at (-0.2, -0.9) [right]{\parbox{4cm}{
    \begin{align*}
     E_{\parallel} &= 44 \, \mathrm{GPa} && \text{\scriptsize elast.\ mod.\ in fiber direction} \\
     E_{\perp} &= 13 \, \mathrm{GPa} && \text{\scriptsize elast.\ mod.\ in isotropic\ plane} \\ 
-    G_{\parallel \perp} &= 5.6 \, \mathrm{GPa} && \text{\scriptsize shear mod.\ in planes parallel to fiber} \\
-    G_{\perp \perp} &= 5.0 \, \mathrm{GPa} && \text{\scriptsize shear mod.\ in isotropic plane} \\
+    \mu_{\parallel \perp} &= 5.6 \, \mathrm{GPa} && \text{\scriptsize shear mod.\ in planes parallel to fiber} \\
+    \mu_{\perp \perp} &= 5.0 \, \mathrm{GPa} && \text{\scriptsize shear mod.\ in isotropic plane} \\
    \nu_{\parallel \perp} &= 0.25 && \text{\scriptsize Poisson's ratio for tension in fibre direction} \\
 %    \nu_{\parallel} &= 0.3 && \text{\scriptsize elast.\ mod.\ in fibre direction}\\
    \end{align*}
    }};}
-   \onslide<1>{\node at (2.2, -0.7) [right]{\parbox{4cm}{
+   \onslide<1>{
+   \node at (2.3, -0.7) [right]{\parbox{4cm}{
    \begin{align*}
     [u^p_i] &= \begin{bmatrix} 0.02 \ell \\ 0 \\ 0 \end{bmatrix} \\[1ex]  \ell &= 1\,\mathrm{m}
    \end{align*}
    }};}
-  \end{scope}
-  
+   
   \end{tikzpicture}
   \end{center}
 
@@ -112,85 +212,4 @@
   \node at (1, -6) [right,font=\footnotesize]{$\v u$ scaled with a factor of $10$};
  \end{tikzpicture}
 \end{frame}
-
-% 
-% 
-% \begin{frame}
-%  \frametitle{Demo 8-2 $\vert$ \bfseries Isotropy}
-%  \framesubtitle{\bfseries compression test}
-%   \begin{overlayarea}{0.9\textwidth}{0.9\textheight}
-%   \vspace*{-3ex}
-%  \begin{center}
-%  \begin{tikzpicture}[scale=3]
-%   \fill[gray!10, draw=black] (0, 1) rectangle (1, 0) node[above left, black]{$\mathcal{B}$};
-% 
-%   \draw[thin,gray] (0, 1) -- +(0, 0.4);
-%   \draw[thin,gray] (1, 1) -- +(0, 0.4);
-%   \draw[<->,thin,gray] (0, 1.35) -- node[fill=white]{$\ell$} +(1, 0);
-%   \draw[thin,gray] (1, 0) -- +(0.6, 0);
-%   \draw[thin,gray] (1, 1) -- +(0.6, -0);
-%   \draw[<->,gray] (1.55, 0) -- node[fill=white,sloped]{$\ell$} +(0, 1);
-% 
-%    \draw[thick,-latex] (0, 0) -- +(0.5, 0) node[above]{$\v e_1$};
-%    \draw[thick,-latex] (0, 0) -- +(0, 0.5) node[right]{$\v e_2$};
-% 
-%    \foreach \x in {0.0,0.1666,0.333,...,1.0} {
-%     \draw[-latex] (1.2, 0.05+0.9/1.0*\x) -- +(-0.2, 0);
-%     \draw[-latex] (0.05+0.9/1.0*\x, 1.2) -- +(0, -0.2);
-%   }
-%   \draw (0.05, 1.2) -- +(0.9, 0);
-%   \draw (1.2, 0.05) -- +(0, 0.9);
-%   \node at (1.2, 0.8) [right,xshift=0.0cm]{$\v t^p$};
-%   
-% %   \foreach \x in {0.0,0.1666,0.333,...,1.0}
-% %   \draw[thick,-latex] (1, 0.05+0.9/1.0*\x) -- +(0.2, 0);
-% %   \node at (1.2, 0.8) [right,xshift=0.0cm]{$\v u^p$};
-% 
-%   \fill[pattern=north west lines, pattern color=black] (-0.1, -0.05) rectangle +(-0.1, 1.1);
-%   \draw[thick] (-0.1, -0.05) -- +(0, 1.1);
-%   \draw[yshift=0.05cm] (0, 0) -- +(-0.07, 0.06) -- +(-0.07, -0.06) -- (0,0) +(-0.07, -0.1) -- +(-0.07, 0.1);
-%   \draw[yshift=0.95cm] (0, 0) -- +(-0.07, 0.06) -- +(-0.07, -0.06) -- (0,0) +(-0.07, -0.1) -- +(-0.07, 0.1);
-% 
-%   \fill[pattern=north west lines, pattern color=black] (-0.05, -0.1) rectangle +(1.1, -0.1);
-%   \draw[thick] (-0.05, -0.1) -- +(1.1, 0);
-%   \draw[xshift=0.05cm,rotate=90] (0, 0) -- +(-0.07, 0.06) -- +(-0.07, -0.06) -- (0,0) +(-0.07, -0.1) -- +(-0.07, 0.1);
-%   \draw[xshift=0.95cm,rotate=90] (0, 0) -- +(-0.07, 0.06) -- +(-0.07, -0.06) -- (0,0) +(-0.07, -0.1) -- +(-0.07, 0.1);
-% 
-% %   \fill[pattern=north west lines, pattern color=black] (3, -0.25) rectangle +(0.25, 1.5);
-% %   \draw[thick] (3, -0.25) -- +(0, 1.5);
-%   
-%   \begin{scope}
-%    \onslide<1>{\node at (-0.2, -0.7) [right]{\parbox{4cm}{\begin{align*} E &= 200 \, \mathrm{GPa} \\ \nu &= 0.5, \, 0.3, \, 0.0, \, -0.5 \\ \ell &= 1\,\mathrm{m} \end{align*}}};}
-% %    \onslide<1>{\node at (1.5, -0.7) [right]{$[u^p_i] = -\begin{bmatrix} 0.2 \ell \\ 0 \\ 0 \end{bmatrix}$ on $\partial \mathcal{B}^t_\text{right}$};}
-%    \onslide<1>{\node at (1.7, -0.7) [right]{$\vert \v t^p \vert = 50 \, \mathrm{MPa}$};}
-%   \end{scope}
-%   
-%   \end{tikzpicture}
-%   \end{center}
-% 
-%  \end{overlayarea}
-% \end{frame}
-% 
-% 
-% \begin{frame}
-%  \frametitle{Demo 8-2 $\vert$ \bfseries Isotropy}
-%  \framesubtitle{\bfseries compression test}
-%   \vspace*{-2ex}
-%   \hspace*{-2em}
-%   \begin{tikzpicture}
-%   \node at(0,0) {\includegraphics[width=3cm]{../08-isotropy/02-compression/comp_05.png}};
-%   \node at(6,0) {\includegraphics[width=3cm]{../08-isotropy/02-compression/comp_03.png}};
-%   \node at(0,-3.8) {\includegraphics[width=3cm]{../08-isotropy/02-compression/comp_00.png}};
-%   \node at(6,-3.8) {\includegraphics[width=3cm]{../08-isotropy/02-compression/comp_-05.png}};
-%   
-%   \node at(-2.6, -0.7) {\parbox{2cm}{\begin{align*} \nu &= 0.5 \\[-0.5ex] \rightarrow K &= \infty \end{align*}}};
-%   \node at(-2.4, -1.5) [font=\scriptsize]{(incompressible)};
-%   \node at(3.4, -0.7) {\parbox{2cm}{\begin{align*} \nu &= 0.3 \\[-0.5ex] \rightarrow K &\approx 167\,\mathrm{GPa} \end{align*}}};
-%   \node at(-2.6, -4.5) {\parbox{2cm}{\begin{align*} \nu &= 0.0 \\[-0.5ex] \rightarrow K &\approx 67\,\mathrm{GPa} \end{align*}}};
-%   \node at(3.4, -4.5) {\parbox{2cm}{\begin{align*} \nu &= -0.5 \\[-0.5ex] \rightarrow K &\approx 33\,\mathrm{GPa} \end{align*}}};
-%   \node at(3.4, -5.3) [font=\scriptsize]{(auxetic)};
-%   
-%   \node at (0, -6) [right,font=\footnotesize]{$\v u$ scaled with a factor of $1000$};
-%   \end{tikzpicture}
-% \end{frame}
 
