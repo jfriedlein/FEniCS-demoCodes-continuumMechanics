@@ -22,19 +22,19 @@ nm_gamma = 0.5
 ################################
 
 # Define geometry and mesh
-p_llb = Point(0.0, 0.0, 0.0)
-p_rtf = Point(0.4, 0.1, 0.1)
-mesh = RectangleMesh(p_llb, p_rtf, 20, 5)
-#mesh = BoxMesh(p_llb, p_rtf, 4, 1, 1)
+p0 = Point(0.0, 0.0, 0.0)
+p1 = Point(0.4, 0.1, 0.1)
+mesh = RectangleMesh(p0, p1, 20, 5)
+#mesh = BoxMesh(p0, p1, 4, 1, 1)
 
 # Define boundaries
 boundaries = FacetFunction("size_t", mesh)
 boundaries.set_all(0)
 left, right, bottom, top = 1, 2, 3, 4
-CompiledSubDomain("near(x[0], side) && on_boundary", side = p_llb[0]).mark(boundaries, left)
-CompiledSubDomain("near(x[0], side) && on_boundary", side = p_rtf[0]).mark(boundaries, right)
-CompiledSubDomain("near(x[1], side) && on_boundary", side = p_llb[1]).mark(boundaries, bottom)
-CompiledSubDomain("near(x[1], side) && on_boundary", side = p_rtf[1]).mark(boundaries, top)
+CompiledSubDomain("near(x[0], side) && on_boundary", side = p0[0]).mark(boundaries, left)
+CompiledSubDomain("near(x[0], side) && on_boundary", side = p1[0]).mark(boundaries, right)
+CompiledSubDomain("near(x[1], side) && on_boundary", side = p0[1]).mark(boundaries, bottom)
+CompiledSubDomain("near(x[1], side) && on_boundary", side = p1[1]).mark(boundaries, top)
 
 # Coordinates and surface integral element
 x = SpatialCoordinate(mesh)

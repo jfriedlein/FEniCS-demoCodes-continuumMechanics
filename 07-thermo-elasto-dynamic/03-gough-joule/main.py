@@ -22,18 +22,18 @@ nm_gamma = 0.5
 ################################
 
 # Define geometry and mesh
-pt0 = Point(0.0, 0.0, 0.0)
-pt1 = Point(0.4, 0.1, 0.1)
-mesh = RectangleMesh(pt0, pt1, 100, 25)
+p0 = Point(0.0, 0.0, 0.0)
+p1 = Point(0.4, 0.1, 0.1)
+mesh = RectangleMesh(p0, p1, 100, 25)
 
 # Define boundaries
 boundaries = FacetFunction("size_t", mesh)
 boundaries.set_all(0)
 left, right, bottom, top = 1, 2, 3, 4
-CompiledSubDomain("near(x[0], side) && on_boundary", side = pt0[0]).mark(boundaries, left)
-CompiledSubDomain("near(x[0], side) && on_boundary", side = pt1[0]).mark(boundaries, right)
-CompiledSubDomain("near(x[1], side) && on_boundary", side = pt0[1]).mark(boundaries, bottom)
-CompiledSubDomain("near(x[1], side) && on_boundary", side = pt1[1]).mark(boundaries, top)
+CompiledSubDomain("near(x[0], side) && on_boundary", side = p0[0]).mark(boundaries, left)
+CompiledSubDomain("near(x[0], side) && on_boundary", side = p1[0]).mark(boundaries, right)
+CompiledSubDomain("near(x[1], side) && on_boundary", side = p0[1]).mark(boundaries, bottom)
+CompiledSubDomain("near(x[1], side) && on_boundary", side = p1[1]).mark(boundaries, top)
 
 # Coordinates and surface integral element
 x = SpatialCoordinate(mesh)
@@ -59,7 +59,7 @@ u_n = Function(V_u)
 u_n.interpolate(Constant((0.0, 0.0)))
 v_n = Function(V_u)
 v_n.interpolate(Constant((0.0, 0.0)))
-#v_n.interpolate(Expression("x[0]*x[0]/l/l*0.1"), l=pt1[0], degree=1))
+#v_n.interpolate(Expression("x[0]*x[0]/l/l*0.1"), l=p1[0], degree=1))
 
 theta0 = 25.0
 theta_n = Function(V_theta)

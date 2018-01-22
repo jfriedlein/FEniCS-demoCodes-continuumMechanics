@@ -22,18 +22,18 @@ nm_gamma = 0.5
 ################################
 
 # Define geometry and mesh
-pt0 = Point(0.0, 0.0, 0.0)
-pt1 = Point(0.03, 0.002, 0.005)
-mesh = RectangleMesh(pt0, pt1, 50, 10)
+p0 = Point(0.0, 0.0, 0.0)
+p1 = Point(0.03, 0.002, 0.005)
+mesh = RectangleMesh(p0, p1, 50, 10)
 
 # Define boundaries
 boundaries = FacetFunction("size_t", mesh)
 boundaries.set_all(0)
 left, right, bottom, top = 1, 2, 3, 4
-CompiledSubDomain("near(x[0], side) && on_boundary", side = pt0[0]).mark(boundaries, left)
-CompiledSubDomain("near(x[0], side) && on_boundary", side = pt1[0]).mark(boundaries, right)
-CompiledSubDomain("near(x[1], side) && on_boundary", side = pt0[1]).mark(boundaries, bottom)
-CompiledSubDomain("near(x[1], side) && on_boundary", side = pt1[1]).mark(boundaries, top)
+CompiledSubDomain("near(x[0], side) && on_boundary", side = p0[0]).mark(boundaries, left)
+CompiledSubDomain("near(x[0], side) && on_boundary", side = p1[0]).mark(boundaries, right)
+CompiledSubDomain("near(x[1], side) && on_boundary", side = p0[1]).mark(boundaries, bottom)
+CompiledSubDomain("near(x[1], side) && on_boundary", side = p1[1]).mark(boundaries, top)
 
 # Coordinates and surface integral element
 x = SpatialCoordinate(mesh)
@@ -57,7 +57,7 @@ V_theta = V.sub(1).collapse()
 # Interpolate initial displacement, velocity and temperature
 u_n = Function(V_u)
 u_n.interpolate(Constant((0.0, 0.0)))
-#u_n.interpolate(Expression(("0.0", "x[0]*x[0]/l/l*0.1"), l=pt1[0], degree=1))
+#u_n.interpolate(Expression(("0.0", "x[0]*x[0]/l/l*0.1"), l=p1[0], degree=1))
 v_n = Function(V_u)
 v_n.interpolate(Constant((0.0, 0.0)))
 
@@ -83,7 +83,7 @@ rho = 8.e3
 g = 9.81
 
 kappa = 80.0
-alpha = 1.0*conditional(lt(x[1], pt1[1]/2.0), 1.e-6, 15.0e-6)
+alpha = 1.0*conditional(lt(x[1], p1[1]/2.0), 1.e-6, 15.0e-6)
 beta = alpha*E/(1-2.0*nu)
 cv = rho*400
 
