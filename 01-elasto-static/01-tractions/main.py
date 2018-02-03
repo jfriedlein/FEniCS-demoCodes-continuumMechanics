@@ -94,4 +94,3 @@ stress = project(sigma(u)/1.e6, T, solver_type="cg", preconditioner_type="petsc_
 stress.rename("sigma", "stress")
 
 File("stress.pvd", "compressed") << stress
-
