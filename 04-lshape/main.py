@@ -1,4 +1,4 @@
-from dolfin import *
+from fenics import *
 
 ################################
 #### PROBLEM DEFINITION ########
@@ -25,7 +25,7 @@ for i in range (0, 4):
 
 
 # Define boundaries
-boundaries = FacetFunction("size_t", mesh)
+boundaries = MeshFunction("size_t", mesh, d-1)
 boundaries.set_all(0)
 left, right, bottom, top, = 1, 2, 3, 4
 CompiledSubDomain("near(x[0], side) && on_boundary", side = 1.0).mark(boundaries, left)

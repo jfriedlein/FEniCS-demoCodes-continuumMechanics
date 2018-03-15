@@ -1,4 +1,4 @@
-from dolfin import *
+from fenics import *
 
 ################################
 #### PROBLEM DEFINITION ########
@@ -11,7 +11,7 @@ p1 = Point(1.0, 1.0, 1.0)
 mesh = BoxMesh(p0, p1, 5, 5, 5)
 
 # Define boundaries
-boundaries = FacetFunction("size_t", mesh)
+boundaries = MeshFunction("size_t", mesh, d-1)
 boundaries.set_all(0)
 left, right, bottom, top, back, front = 1, 2, 3, 4, 5, 6
 CompiledSubDomain("near(x[0], side) && on_boundary", side = p0[0]).mark(boundaries, left)

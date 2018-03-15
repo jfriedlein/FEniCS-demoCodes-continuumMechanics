@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 from __future__ import print_function
-from dolfin import *
+from fenics import *
 import numpy as np
 
 # Time definitions
@@ -25,7 +25,7 @@ p1 = Point(0.1, 0.1, 0.1)
 mesh = RectangleMesh(p0, p1, 50, 50)
 
 # Define boundaries
-boundaries = FacetFunction("size_t", mesh)
+boundaries = MeshFunction("size_t", mesh, d-1)
 boundaries.set_all(0)
 left, right, bottom, top = 1, 2, 3, 4
 CompiledSubDomain("near(x[0], side) && on_boundary", side = p0[0]).mark(boundaries, left)

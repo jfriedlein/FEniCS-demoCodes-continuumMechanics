@@ -1,4 +1,4 @@
-from dolfin import *
+from fenics import *
 
 ################################
 #### PROBLEM DEFINITION ########
@@ -11,7 +11,7 @@ p1 = Point(1.5, 1.0, 1.0)
 mesh = BoxMesh(p0, p1, 15, 10, 10)
 
 # Define boundaries
-boundaries = FacetFunction("size_t", mesh)
+boundaries = MeshFunction("size_t", mesh, d-1)
 boundaries.set_all(0)
 left, right, bottom, top = 1, 2, 3, 4
 CompiledSubDomain("near(x[0], side) && on_boundary", side = p0[0]).mark(boundaries, left)
@@ -62,13 +62,16 @@ l = dot(b, delta_u)*dx + dot(t_p, delta_u)*ds(top)
 
 u = Function(V)
 
-K = assemble(a)
-F = assemble(l)
-for bc in bcs:
-	bc.apply(K, F)
-U = u.vector()
-solve(K, U, F)
+#K = assemble(a)
+#F = assemble(l)
+#for bc in bcs:
+#	bc.apply(K, F)
+#U = u.vector()
+#solve(K, U, F)
 
+solve(a == l, u, bcs=bcs, 
+	      solver_parameters={"linear_solver": "mumps"},
+	      form_compiler_parameters={"optimize": True})
 
 ################################
 #### POST-PROCESSING ###########
@@ -90,7 +93,7 @@ T = TensorFunctionSpace(mesh, "Lagrange", p)
 #stress.rename("stress", "xx")
 #stress = project(von_mises(sigma(u))/1.e6, S)
 #stress.rename("stress", "vonMises")
-stress = project(sigma(u)/1.e6, T, solver_type="cg", preconditioner_type="petsc_amg")
+stress = project(sigma(u)/1.e6, T, solver_type="mumps")
 stress.rename("sigma", "stress")
 
 File("stress.pvd", "compressed") << stress
