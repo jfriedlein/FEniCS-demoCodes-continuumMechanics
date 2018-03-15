@@ -28,7 +28,7 @@ mesh = RectangleMesh(p0, p1, 20, 5)
 #mesh = BoxMesh(p0, p1, 4, 1, 1)
 
 # Define boundaries
-boundaries = MeshFunction("size_t", mesh, d-1)
+boundaries = MeshFunction("size_t", mesh, 1)
 boundaries.set_all(0)
 left, right, bottom, top = 1, 2, 3, 4
 CompiledSubDomain("near(x[0], side) && on_boundary", side = p0[0]).mark(boundaries, left)
@@ -103,10 +103,6 @@ F = rho*dot(delta_u, a(u, u_pred))*dx \
 	- dot(b, delta_u)*dx - dot(t_p, delta_u)*ds(right)
 
 # Project initial stress field
-def dev(s):
-	return s-tr(s)*Identity(3)/3.0
-def von_mises(s):
-	return sqrt(3.0/2.0*inner(dev(s), dev(s)))
 Z = TensorFunctionSpace(mesh, "Lagrange", p)
 stress_n = Function(Z)
 stress_n = project(sigma(u_n)/1.e6, Z, solver_type="mumps")

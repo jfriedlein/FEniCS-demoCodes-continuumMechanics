@@ -27,7 +27,7 @@ p1 = Point(0.03, 0.002, 0.005)
 mesh = RectangleMesh(p0, p1, 50, 10)
 
 # Define boundaries
-boundaries = MeshFunction("size_t", mesh, d-1)
+boundaries = MeshFunction("size_t", mesh, 1)
 boundaries.set_all(0)
 left, right, bottom, top = 1, 2, 3, 4
 CompiledSubDomain("near(x[0], side) && on_boundary", side = p0[0]).mark(boundaries, left)
@@ -129,10 +129,6 @@ F = rho*dot(delta_u, a(u, u_pred))*dx \
 	- r*delta_theta*dx - q_p*delta_theta*ds(top)
 
 # Project initial stress field
-def dev(s):
-	return s-tr(s)*Identity(d)/3.0
-def von_mises(s):
-	return sqrt(3.0/2.0*inner(dev(s), dev(s)))
 #V_stress = TensorFunctionSpace(mesh, "Lagrange", p)
 #stress_n = Function(V_stress)
 #stress_n = project(sigma(u_n, theta_n)/1.e6, V_stress, solver_type="mumps")

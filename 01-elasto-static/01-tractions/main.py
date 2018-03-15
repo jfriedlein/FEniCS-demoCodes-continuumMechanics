@@ -59,8 +59,10 @@ l = dot(b, delta_u)*dx + dot(t_p, delta_u)*ds(top)
 #### ASSEMBLE AND SOLVE ########
 ################################
 
-
 u = Function(V)
+solve(a == l, u, bcs=bcs, 
+	      solver_parameters={"linear_solver": "mumps"},
+	      form_compiler_parameters={"optimize": True})
 
 #K = assemble(a)
 #F = assemble(l)
@@ -68,10 +70,6 @@ u = Function(V)
 #	bc.apply(K, F)
 #U = u.vector()
 #solve(K, U, F)
-
-solve(a == l, u, bcs=bcs, 
-	      solver_parameters={"linear_solver": "mumps"},
-	      form_compiler_parameters={"optimize": True})
 
 ################################
 #### POST-PROCESSING ###########
@@ -82,18 +80,13 @@ u.rename("u", "displacement")
 File("displacement.pvd", "compressed") << u
 
 # Project stress field and create stress file
-def dev(s):
-	return s-tr(s)*Identity(d)/3.0
-def von_mises(s):
-	return sqrt(3.0/2.0*inner(dev(s), dev(s)))
-S = FunctionSpace(mesh, "Lagrange", p)
+#def dev(s):
+#	return s-tr(s)*Identity(d)/3.0
+#def von_mises(s):
+#	return sqrt(3.0/2.0*inner(dev(s), dev(s)))
+
 T = TensorFunctionSpace(mesh, "Lagrange", p)
-
-#stress = project(sigma(u)[0,0]/1.e6, S)
-#stress.rename("stress", "xx")
-#stress = project(von_mises(sigma(u))/1.e6, S)
-#stress.rename("stress", "vonMises")
 stress = project(sigma(u)/1.e6, T, solver_type="mumps")
-stress.rename("sigma", "stress")
 
+stress.rename("sigma", "stress")
 File("stress.pvd", "compressed") << stress

@@ -50,7 +50,6 @@ l = r*delta_theta*dx + q_p*delta_theta*ds(top)
 #### ASSEMBLE AND SOLVE ########
 ################################
 
-
 theta = Function(V)
 
 A = assemble(a)
@@ -59,7 +58,6 @@ for bc in bcs:
 	bc.apply(A, B)
 X = theta.vector()
 solve(A, X, B)
-
 
 ################################
 #### POST-PROCESSING ###########

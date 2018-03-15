@@ -109,15 +109,18 @@ u.rename("u","displacement")
 File("displacement.pvd", "compressed") << u
 
 # Project stress field and create stress file
-def dev(s):
-	return s-tr(s)*Identity(d)/3.0
-def von_mises(s):
-	return sqrt(3.0/2.0*inner(dev(s), dev(s)))
+#def dev(s):
+#	return s-tr(s)*Identity(d)/3.0
+#def von_mises(s):
+#	return sqrt(3.0/2.0*inner(dev(s), dev(s)))
+#S = FunctionSpace(mesh, "Lagrange", p)
+#stress = project(von_mises(sigma(u))/1.e6, S)
+#stress.rename("stress", "vonMises")
+
 S = FunctionSpace(mesh, "Lagrange", p)
 stress = project(sigma(u, theta)[0,0]/1.e6, S)
 stress.rename("stress", "xx")
-#stress = project(von_mises(sigma(u))/1.e6, S)
-#stress.rename("stress", "vonMises")
+
 #T = TensorFunctionSpace(mesh, "Lagrange", p)
 #stress = project(sigma(u, theta)/1.e6, T, solver_type="cg")
 #stress.rename("sigma", "stress")

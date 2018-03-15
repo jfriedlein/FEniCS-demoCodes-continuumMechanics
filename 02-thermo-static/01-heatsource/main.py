@@ -51,7 +51,6 @@ l = r*delta_theta*dx + q_p*delta_theta*ds(right)
 #### ASSEMBLE AND SOLVE ########
 ################################
 
-
 theta = Function(V)
 
 A = assemble(a)
@@ -61,7 +60,6 @@ for bc in bcs:
 X = theta.vector()
 solve(A, X, B)
 
-
 ################################
 #### POST-PROCESSING ###########
 ################################
@@ -70,4 +68,3 @@ solve(A, X, B)
 theta.rename("theta", "temperature")
 file_theta = File("temperature.pvd", "compressed")
 file_theta << theta
-

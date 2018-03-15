@@ -12,7 +12,7 @@ mesh = refine(mesh)
 margin = 0.5
 for i in range (0, 4):
 	margin = margin*2.0/3.0
-	markers = CellFunction("bool", mesh)
+	markers = MeshFunction("bool", mesh, d)
 	markers.set_all(False)
 	CompiledSubDomain("x[1]>(0.5-m) && x[1]<(0.5+m)", m=margin).mark(markers, True)
 	mesh = refine(mesh, markers)
@@ -79,9 +79,12 @@ M = 0.5*inner(grad(u), sigma(u))*dx - dot(b, u)*dx - dot(t_p, u)*ds(right)
 #### ASSEMBLE AND SOLVE ########
 ################################
 
-
 u = Function(V)
-
+solve(a == l, u, bcs=bcs, 
+	  solver_parameters={"linear_solver": "mumps"},
+	  form_compiler_parameters={"optimize": True})
+#	  tol=1.e-1, M=M)
+	  
 #K = assemble(a)
 #F = assemble(l)
 #for bc in bcs:
@@ -90,12 +93,6 @@ u = Function(V)
 #solve(K, U, F)
 #solver = LUSolver(K, "mumps")
 #solver.solve(U, F)
-
-solve(a == l, u, bcs=bcs, 
-	  solver_parameters={"linear_solver": "mumps"},
-	  form_compiler_parameters={"optimize": True})
-#	  tol=1.e-1, M=M)
-	  
 
 ################################
 #### POST-PROCESSING ###########
@@ -106,17 +103,7 @@ u.rename("u", "displacement")
 File("displacement.pvd", "compressed") << u
 
 # Project stress field and create stress file
-def dev(s):
-	return s-tr(s)*Identity(d)/3.0
-def von_mises(s):
-	return sqrt(3.0/2.0*inner(dev(s), dev(s)))
-S = FunctionSpace(mesh, "Lagrange", p)
 T = TensorFunctionSpace(mesh, "Lagrange", p)
-
-#stress = project(sigma(u)[0,0]/1.e6, S)
-#stress.rename("stress", "xx")
-#stress = project(von_mises(sigma(u))/1.e6, S)
-#stress.rename("stress", "vonMises")
 stress = project(sigma(u)/1.e6, T, solver_type="mumps")
 stress.rename("sigma", "stress")
 

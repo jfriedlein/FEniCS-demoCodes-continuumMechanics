@@ -4,54 +4,6 @@ import numpy as np
 
 set_log_level(WARNING)
 
-class Stress(Expression):
-    def __init__(self, a, b, **kwargs):
-        #Expression.__init__(self)
-        self.a = A
-        self.b = B
-        self.m = (self.a-self.b)/(self.a+self.b)
-        self.beta = 0
-        self.t = 1
-        
-    def value_shape(self):
-        return (2,2,)
-        
-    def eval(self, values, x):
-        ure = (x[0]*x[0]-x[1]*x[1])-(self.a*self.a-self.b*self.b)
-        urho = np.sqrt(ure*ure+4.0*x[0]*x[0]*x[1]*x[1])
-        zetare = (x[0]+np.sign(x[0])*np.sqrt(0.5*np.maximum(urho+ure, 0.0)))/(self.a+self.b)
-        zetaim = (x[1]+np.sign(x[1])*np.sqrt(0.5*np.maximum(urho-ure, 0.0)))/(self.a+self.b)
-        rho = np.sqrt(zetare*zetare+zetaim*zetaim)
-        theta = np.arctan2(zetaim, zetare)
-        
-        rho2 = rho*rho
-        rho4 = rho2*rho2
-        rho6 = rho4*rho2
-        
-        S1 = (rho4-2.0*rho2*np.cos(2.0*theta-2.0*self.beta)+2.0*self.m*np.cos(2.0*self.beta)-self.m*self.m)/(rho4-2.0*self.m*rho2*np.cos(2.0*theta)+self.m*self.m)
-	    
-        S2zr = (rho6*np.cos(-6.0*theta+2.0*self.beta) - 2.0*self.m*rho2*(np.cos(-4.0*theta-2.0*self.beta) - self.m*np.cos(-4.0*theta)) - 3.0*self.m*rho4*np.cos(-4.0*theta+2.0*self.beta) - (self.m*self.m-2.0*np.cos(2.0*self.beta)*self.m+1.0)*rho4*np.cos(4.0*theta)	- 2.0*rho4*(np.cos(-2.0*theta-2.0*self.beta) - self.m*np.cos(-2.0*theta)) + 3.0*rho2*np.cos(2.0*theta+2.0*self.beta) - self.m*(self.m*self.m-2.0*np.cos(2.0*self.beta)*self.m+1.0)*rho2*np.cos(2.0*theta) - self.m*np.cos(2.0*self.beta))
-        S2zi = (rho6*np.sin(-6.0*theta+2.0*self.beta) - 2.0*self.m*rho2*(np.sin(-4.0*theta-2.0*self.beta) - self.m*np.sin(-4.0*theta)) - 3.0*self.m*rho4*np.sin(-4.0*theta+2.0*self.beta) - (self.m*self.m-2.0*np.cos(2.0*self.beta)*self.m+1.0)*rho4*np.sin(-4.0*theta) - 2.0*rho4*(np.sin(-2.0*theta-2.0*self.beta) - self.m*np.sin(-2.0*theta)) + 3.0*rho2*np.sin(-2.0*theta-2.0*self.beta) - self.m*(self.m*self.m-2.0*np.cos(2.0*self.beta)*self.m+1.0)*rho2*np.sin(-2.0*theta) - self.m*np.sin(-2.0*self.beta))
-        
-        S2nr = rho6*np.cos(6.0*theta)-3.0*self.m*rho4*np.cos(4.0*theta)+3.0*self.m*self.m*rho2*np.cos(2.0*theta)-self.m*self.m*self.m
-        S2ni = -rho6*np.sin(6.0*theta)+3.0*self.m*rho4*np.sin(4.0*theta)-3.0*self.m*self.m*rho2*np.sin(2.0*theta)
-        
-        ReS2 = (S2zr*S2nr+S2zi*S2ni)/(S2nr*S2nr+S2ni*S2ni)
-        ImS2 = (S2zi*S2nr-S2zr*S2ni)/(S2nr*S2nr+S2ni*S2ni)
-        
-        sigmaxx = self.t*0.5*(S1+ReS2)
-        sigmayy = self.t*0.5*(S1-ReS2)
-        sigmaxy = self.t*0.5*(ImS2)
-        
-        #sigma_xx
-        values[0] = np.cos(self.beta)*np.cos(self.beta)*sigmaxx+np.sin(self.beta)*np.sin(self.beta)*sigmayy+2.0*np.cos(self.beta)*np.sin(self.beta)*sigmaxy
-        #sigma_yy
-        values[3] = np.sin(self.beta)*np.sin(self.beta)*sigmaxx+np.cos(self.beta)*np.cos(self.beta)*sigmayy-2.0*np.cos(self.beta)*np.sin(self.beta)*sigmaxy
-        #sigma_xy
-        values[1] = -np.cos(self.beta)*np.sin(self.beta)*sigmaxx+np.sin(self.beta)*np.cos(self.beta)*sigmayy+(np.cos(self.beta)*np.cos(self.beta)-np.sin(self.beta)*np.sin(self.beta))*sigmaxy
-        #sigma_yx
-        values[2] = values[1]
-    
 
 cpp_code = '''
 class Stress : public Expression {
@@ -271,13 +223,7 @@ for i in range(2, 10):
     file_u << u
 
     # Project stress field and create stress file
-    #def dev(s):
-	#    return s-tr(s)*Identity(d)/3.0
-    #def von_mises(s):
-	#    return sqrt(3.0/2.0*inner(dev(s), dev(s)))
     S = FunctionSpace(mesh, "Lagrange", p)
-    #T = TensorFunctionSpace(mesh, "Lagrange", p)
-
     stress_proj = project(sigma(u)[0,0], S, solver_type="mumps")
     stress_proj.rename("sigma_xx", "stress")
 
