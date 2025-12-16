@@ -9,9 +9,9 @@ parameters["form_compiler"]["optimize"] = True
 
 # Time definitions
 t = 0.0
-#T = 0.005
+T = 0.005
 num_steps = 200
-#dt = T / num_steps
+dt = T / num_steps
 
 #Parameters for Newmark (Average acceleration)
 nm_beta = 0.25
@@ -101,6 +101,12 @@ assemble(a, tensor=K)
 [bc.apply(K) for bc in bcs]
 print("Solve for eigenvalues...")
 eigensolver = SLEPcEigenSolver(K, M)
+
+dirname2 = "all_evs"+"/"
+if not path.exists(dirname2):
+	mkdir(dirname2)
+file_rx = File(dirname2+"modes.pvd", "compressed")
+
 #eigensolver.parameters["problem_type"] = "gen_hermitian"
 eigensolver.solve()
 for i in range(0, M.size(0)):
@@ -108,11 +114,15 @@ for i in range(0, M.size(0)):
 	if r < 1.1:
 		break
 	print(" Eigenvalue ", i, " = +-i", sqrt(r))
+	rx_n = Function(V)
+	rx_n.vector()[:]=rx
+	rx_n.rename("u","mode")	
+	file_rx << (rx_n, float(i))
 
 j = int(input("Enter number of eigenvalue: "))
 
 r, c, rx, cx = eigensolver.get_eigenpair(j)
-u_n.vector()[:] = rx/norm(rx, "linf")*0.1*0.5
+u_n.vector()[:] = rx/norm(rx, "linf")*0.00001*0.5
 
 T = 4*2*pi/sqrt(r)
 dt = T / num_steps
@@ -170,12 +180,12 @@ for n in range(num_steps):
     # Update loads, boundary data, ...
     #u_p.t = t
     #theta_p.t = t
-
+    #print("here")
     # Define predictors
     u_pred.vector()[:] = u_n.vector()+dt*v_n.vector()\
     					 +0.5*dt*dt*(1-2*nm_beta)*a_n.vector()
     v_pred.vector()[:] = v_n.vector()+dt*(1-nm_gamma)*a_n.vector()
-    
+    #print("here2")
     # Assemble and solve
     b = assemble(rhs(F))
     [bc.apply(b) for bc in bcs]
