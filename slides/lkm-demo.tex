@@ -1,5 +1,19 @@
 \documentclass[xcolor=dvipsnames]{beamer}
 
+% Changelog
+% V1 - 251007 (used for WS2025/26)
+% - added page number
+% - added version number
+% - added hyperlinked videos
+% - slight changes to Demo 11
+% - added slide numbers and version number
+% V1+
+% - Demo 2-1: added coordinates of point x_0
+
+% Note:
+% For the hyperlinked videos to directly open on clicking in Adobe Reader:
+% Adobe Reader -> Preferences -> Security (enhanced) -> Add Folder Path: Add the path to the parent folder that contains all videos
+
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb}
@@ -13,6 +27,7 @@
 \usetikzlibrary{decorations.pathmorphing}
 \usepackage{pgfplots}
 
+\definecolor{White}{RGB}{255,255,255} % manually added color White due to package clash for "xcolor"
 \definecolor{LTMBlue}{RGB}{0,51,102}
 
 % \usepackage{ifthen}
@@ -24,16 +39,19 @@
 \pdfpageattr {/Group << /S /Transparency /I true /CS /DeviceRGB>>} 
 \setbeamertemplate{navigation symbols}{}
 
+\setbeamertemplate{footline}[page number]
+\addtobeamertemplate{footline}{\hspace{1em} V1 -- 251007}{}
+
 \setbeamercolor{frametitle}{fg=LTMBlue,bg=White}
 \addtobeamertemplate{frametitle}{}{%
-\begin{textblock*}{100mm}(.95\textwidth,-0.75cm)
-\includegraphics[height=0.5cm]{LTM_Logo_klein}
+\begin{textblock*}{100mm}(.97\textwidth,-0.5cm)
+\includegraphics[height=0.5cm]{../../latex/LTM_Logo_klein}
 \end{textblock*}}
 
 \title[LKM Demos]{LKM Demos}
-\author[Jan Friederich, Paul Steinmann]{Jan Friederich, Paul Steinmann}
+\author[Jan Friederich, Dominic Soldner, Paul Steinmann]{Jan Friederich, Dominic Soldner, Paul Steinmann}
 \date{\today}
-\institute[LTM]{Chair of Applied Mechanics}
+\institute[LTM]{Institute of Applied Mechanics}
 % \logo{\includegraphics[height=5mm]{LTM_Logo_klein}}
 
 \renewcommand{\v}[1]{\boldsymbol{#1}}
