@@ -1,92 +1,110 @@
 from fenics import *
 
-################################
-#### PROBLEM DEFINITION ########
-################################
 
-# Define geometry and mesh
-d = 3
-p0 = Point(0.0, 0.0, 0.0)
-p1 = Point(1.5, 1.0, 1.0)
-mesh = BoxMesh(p0, p1, 15, 10, 10)
+#-------------------------------------------------
+# Geometry and mesh generation
+#-------------------------------------------------
 
-# Define boundaries
-boundaries = MeshFunction("size_t", mesh, d-1)
-boundaries.set_all(0)
-left, right, bottom, top = 1, 2, 3, 4
+
+d = 2 # spatial dimension
+p0 = Point(0.0, 0.0) #	bottom-left corner
+p1 = Point(3.0, 1.0) # top-right corner
+mesh = RectangleMesh(p0, p1, 30, 10) # 30 and 10 are the number of elements in x- and y-directions
+
+#-------------------------------------------------
+# Boundary identification and measures
+#-------------------------------------------------
+
+
+boundaries = MeshFunction("size_t", mesh, d-1) # create mesh function for boundary domains
+boundaries.set_all(0) # initialize all boundaries to 0
+left, right, bottom, top = 1, 2, 3, 4 # define boundary IDs
 CompiledSubDomain("near(x[0], side) && on_boundary", side = p0[0]).mark(boundaries, left)
 CompiledSubDomain("near(x[0], side) && on_boundary", side = p1[0]).mark(boundaries, right)
 CompiledSubDomain("near(x[1], side) && on_boundary", side = p0[1]).mark(boundaries, bottom)
 CompiledSubDomain("near(x[1], side) && on_boundary", side = p1[1]).mark(boundaries, top)
 
-# Surface integral element
-ds = Measure('ds', domain=mesh, subdomain_data=boundaries)
+ds = Measure('ds', domain=mesh, subdomain_data=boundaries) # define measure for boundary integration
 
-# Define function space
-p = 2
-V = VectorFunctionSpace(mesh, "Lagrange", p)
 
-# Define trial and test functions
-u = TrialFunction(V)
+#-------------------------------------------------
+# Function spaces and variational functions
+#-------------------------------------------------
+
+
+p = 2 # polynomial degree
+V = VectorFunctionSpace(mesh, "Lagrange", p) # define function space for displacement field
+
+u = TrialFunction(V) # define trial and test functions
 delta_u = TestFunction(V)
 
-# Material parameters
-E = 200.e9
-rho = 8.e3
-g = 9.81
-nu = 0.3
-mu    = E/(2.0*(1.0 + nu))
-lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu))
 
-# Volume force/ heat source and prescribed tractions/ prescribed heat fluxes
-b = Constant((0.0, 0.0, 0.0))
-t_p = Constant((0.0, -1.e6, 0.0))
+#-------------------------------------------------
+# Material properties
+#-------------------------------------------------
 
-# Dirichlet boundary conditions
-bcs = [DirichletBC(V, Constant((0.0, 0.0, 0.0)), boundaries, left),
-	   DirichletBC(V.sub(0), Constant((0.0)), boundaries, right)
+
+E = 200.e9 # Young's modulus in Pa
+rho = 8.e3 # density in kg/m^3
+g = 9.81 # acceleration due to gravity in m/s^2
+nu = 0.3 # Poisson's ratio
+mu    = E/(2.0*(1.0 + nu)) # Lame's first parameter
+lmbda = E*nu/((1.0 + nu)*(1.0 - nu)) # Lame's second parameter
+
+
+#-------------------------------------------------
+# Loads and boundary conditions
+#-------------------------------------------------
+
+
+b = Constant((0.0, 0.0)) # body force
+t_p = Constant((0.0, -1.e6)) # traction force
+u_zero = Constant((0.0, 0.0)) # zero displacement
+
+bcs = [DirichletBC(V, u_zero, boundaries, left), # fixed left edge
+	   DirichletBC(V,u_zero, boundaries, right) # fixed right edge
        ]
 
-# Stress tensor (linear isotropic elasticity)
+
+#-----------------------------------------------
+#  Variational formulation of linear elasticity
+#-----------------------------------------------
+
+
 def sigma(u):
-    return lmbda*tr(sym(grad(u)))*Identity(d) + 2.0*mu*sym(grad(u))
+    return lmbda*tr(sym(grad(u)))*Identity(d) + 2.0*mu*sym(grad(u)) # stress tensor
 
-# Weak form a==l
-a = inner(grad(delta_u), sigma(u))*dx
-l = dot(b, delta_u)*dx + dot(t_p, delta_u)*ds(top)
+a = inner(sym(grad(delta_u)),sigma(u))*dx # bilinear form
+l = dot(b, delta_u)*dx + dot(t_p, delta_u)*ds(top) # linear form
 
-################################
-#### ASSEMBLE AND SOLVE ########
-################################
 
-u = Function(V)
+#---------------------------------------------
+# Solve the linear system
+#---------------------------------------------
+
+
+u = Function(V) # solution function
 solve(a == l, u, bcs=bcs, 
 	      solver_parameters={"linear_solver": "mumps"},
-	      form_compiler_parameters={"optimize": True})
+		  form_compiler_parameters={"optimize": True}) # solve the variational problem
 
-#K = assemble(a)
-#F = assemble(l)
-#for bc in bcs:
-#	bc.apply(K, F)
-#U = u.vector()
-#solve(K, U, F)
 
-################################
-#### POST-PROCESSING ###########
-################################
+#-------------------------------------------------
+# Save displacement
+#-------------------------------------------------
 
-# Create displacement and temperature file
-u.rename("u", "displacement")
-File("displacement.pvd", "compressed") << u
 
-# Project stress field and create stress file
-#def dev(s):
-#	return s-tr(s)*Identity(d)/3.0
-#def von_mises(s):
-#	return sqrt(3.0/2.0*inner(dev(s), dev(s)))
+u.rename("u", "displacement") # rename solution for output
+File("displacement.pvd", "compressed") << u # save displacement to file
 
-T = TensorFunctionSpace(mesh, "Lagrange", p)
+
+#-------------------------------------------------
+# Compute and save stress
+#-------------------------------------------------
+
+
+T = TensorFunctionSpace(mesh, "Lagrange", p) # function space for stress output
 stress = project(sigma(u)/1.e6, T, solver_type="mumps")
 
-stress.rename("sigma", "stress")
-File("stress.pvd", "compressed") << stress
+stress.rename("sigma", "stress") # rename stress for output
+File("stress.pvd", "compressed") << stress # save stress to file
