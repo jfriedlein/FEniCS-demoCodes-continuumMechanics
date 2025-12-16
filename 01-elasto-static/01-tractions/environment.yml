@@ -1,0 +1,12 @@
+name: fenics-lkm-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - fenics-dolfin
+  - fenics-ufl
+  - fenics-ffc
+  - fenics-fiat
+  - fenics-dijitso
+  #- paraview
+  
