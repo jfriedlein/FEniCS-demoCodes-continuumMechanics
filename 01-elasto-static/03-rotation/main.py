@@ -89,7 +89,7 @@ lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu)) # Lamé's first parameter (λ); (see La
 #--------------------------------------------------------------------------------------------------------
 
 # Volume force 
-b = Constant((0.0, -rho*g, 0.0))
+b = Constant((0.0, 0.0, 0.0))
 
 # Tractions
 t_p = Constant((0.0, 0.0, 0.0)) 

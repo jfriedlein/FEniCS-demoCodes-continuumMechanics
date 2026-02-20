@@ -124,7 +124,7 @@ b = Constant((0.0, 0.0, 0.0))
 # force that acts on every particle within the material. (eg gravity).
 
 #prescribed tractions
-t_p = Constant((0.0, 0.0, 0.0))  
+t_p = Constant((0.0, -1.e6, 0.0))  
 # force applied on the surface of the material (no traction force applied here)
 
 
