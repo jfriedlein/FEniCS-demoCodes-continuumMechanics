@@ -1,70 +1,138 @@
 from fenics import *
 
-################################
-#### PROBLEM DEFINITION ########
-################################
 
-# Define geometry and mesh
-d = 3
-p0 = Point(0.0, 0.0, 0.0)
-p1 = Point(0.30, 0.10, 0.10)
-mesh = BoxMesh(p0, p1, 30, 10, 10)
 
-# Define boundaries
-boundaries = MeshFunction("size_t", mesh, d-1)
-boundaries.set_all(0)
-left, right, bottom, top = 1, 2, 3, 4
-CompiledSubDomain("near(x[0], side) && on_boundary", side = p0[0]).mark(boundaries, left)
-CompiledSubDomain("near(x[0], side) && on_boundary", side = p1[0]).mark(boundaries, right)
-CompiledSubDomain("near(x[1], side) && on_boundary", side = p0[1]).mark(boundaries, bottom)
-CompiledSubDomain("near(x[1], side) && on_boundary", side = p1[1]).mark(boundaries, top)
+"""-------------------------------------------------3D Thermostatics of a Rectangular Solid--------------------------------------------------
+Problem description: non homogenous heat conduction coefficient
+
+Geometry: Rectangular solid with dimensions 0.30 x 0.10 x 0.10
+Boundary conditions:
+	-Left face is held at 25 degree C
+	-Right face is held at -10 degree C
+	
+Loads:
+	- No Prescribed heat flux
+	- No volumetric heat source 
+    
+
+Analysis type: Quasi-static model
+Material model: Linear Isothermal Isotropic heat conduction
+
+
+Main learnings:
+
+Weak Formulation of Heat Conduction - Definition of weak form for heat conduction problems
+Spatial Coordinate - Usage of spatial coordinates for defining expressions over the domain
+ROTATION BCs - Definition and application of rotational Dirichlet boundary conditions
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+"""
+
+#---------------------------------------------------------------------------------------------------------
+# Geometry and mesh generation
+#---------------------------------------------------------------------------------------------------------
+
+# spatial dimension
+dim = 3 
+
+# Define opposite corners of the rectangular domain
+p0 = Point(0.0, 0.0, 0.0) #	bottom-left front corner
+p1 = Point(0.30, 0.10, 0.10)  # top-right back corner
+mesh = BoxMesh(p0, p1, 30, 10, 10) # Create a structured mesh of the rectangular solid
+
+
+
+#---------------------------------------------------------------------------------------------------------
+# Boundary identification and measures
+#---------------------------------------------------------------------------------------------------------
+
+# MeshFunction to store boundary IDs on facets
+boundaries = MeshFunction("size_t", mesh, dim-1)
+boundaries.set_all(0) # set every face to the value 0
+left, right, bottom, top = 1, 2, 3, 4 # define boundary IDs
+
+# filters every face based on its position and assigns the corresponding boundary ID
+CompiledSubDomain("near(x[0], side) && on_boundary", side = p0[0]).mark(boundaries, left)   
+CompiledSubDomain("near(x[0], side) && on_boundary", side = p1[0]).mark(boundaries, right)  
+CompiledSubDomain("near(x[1], side) && on_boundary", side = p0[1]).mark(boundaries, bottom) 
+CompiledSubDomain("near(x[1], side) && on_boundary", side = p1[1]).mark(boundaries, top)    
 
 # Coordinate and surface integral element
-x = SpatialCoordinate(mesh)
+x = SpatialCoordinate(mesh) # spatial coordinates for defining expressions over the domain - x[1], x[2], x[3]
+
+#  Surface integral element
 ds = Measure('ds', domain=mesh, subdomain_data=boundaries)
 
-# Define function space
+#-------------------------------------------------------------------------------------------------------
+# Function spaces and variational functions
+#-------------------------------------------------------------------------------------------------------
+
+# Polynomial degree of Lagrange finite elements
 p = 2
+
+# Define function space for temperature field.
 V = FunctionSpace(mesh, "Lagrange", p)
 
 # Define trial and test functions
-theta = TrialFunction(V)
-delta_theta = TestFunction(V)
+theta = TrialFunction(V) # unknown temperature field to be solved for
+delta_theta = TestFunction(V) # virtual temperature field for the variational formulation
 
-# Material parameters
+#--------------------------------------------------------------------------------------------------------
+# Material properties
+#--------------------------------------------------------------------------------------------------------
+
+# thermal conductivity in W/mK
 kappa = 1.0*conditional(lt(x[0], p1[0]/3.0), 2.0, conditional(lt(x[0], p1[0]*2.0/3.0), 0.3, 1.0))
+# condition: if x> L/3 then kappa=2.0 
+#            else if x< 2L/3 then kappa=0.3 
+#            else kappa=1.0
 
-# Volume force/ heat source and prescribed tractions/ prescribed heat fluxes
-r = Constant(0.0)
+#--------------------------------------------------------------------------------------------------------
+# Loads and boundary conditions
+#--------------------------------------------------------------------------------------------------------
+
+# heat source 
+r = Constant(0.0) 
+
+# prescribed heat fluxes
 q_p = Constant(0.0)
 
+
 # Dirichlet boundary conditions
-bcs = [DirichletBC(V, Constant((25.0)), boundaries, left),
-	   DirichletBC(V, Constant((-10.0)), boundaries, right)]
+bcs = [DirichletBC(V, Constant((25.0)), boundaries, left),  # Left face is held at 25 degree C
+	   DirichletBC(V, Constant((-10.0)), boundaries, right)]# Right face is held at -10 degree C 
 
-# Weak form a==l
-a = kappa*dot(grad(delta_theta), grad(theta))*dx
-l = r*delta_theta*dx + q_p*delta_theta*ds(top)
+#---------------------------------------------------------------------------------------------------------
+#  Variational formulation (weak form of heat conduction)
+#---------------------------------------------------------------------------------------------------------
 
-################################
-#### ASSEMBLE AND SOLVE ########
-################################
+# bilinear form: internal heat conduction
+# left-hand side of the variational formulation
 
+a = kappa*dot(grad(delta_theta), grad(theta))*dx #see Pg 148 LKM Slides
+
+# linear form: volumetric heat source + boundary heat flux 
+# right-hand side of the variational formulation
+l = r*delta_theta*dx + q_p*delta_theta*ds(top) # l is zero in this case
+
+#---------------------------------------------------------------------------------------------------------
+# Solve the linear system
+#---------------------------------------------------------------------------------------------------------
+
+# Solution function to store temperature field
 theta = Function(V)
 
-A = assemble(a)
-B = assemble(l)
-for bc in bcs:
-	bc.apply(A, B)
-X = theta.vector()
-solve(A, X, B)
+# Solve Ku = f using the direct MUMPS solver
+solve(a == l, theta, bcs=bcs, 
+	      solver_parameters={"linear_solver": "mumps"},
+	      form_compiler_parameters={"optimize": True}) # solve the variational problem
 
-################################
-#### POST-PROCESSING ###########
-################################
+#---------------------------------------------------------------------------------------------------------
+#  Post processing:
+#---------------------------------------------------------------------------------------------------------
 
-# Create temperature file
-theta.rename("theta", "temperature")
-file_theta = File("temperature.pvd", "compressed")
-file_theta << theta
+# Save temperature
+theta.rename("theta", "temperature") # rename temperature for output
+File("temperature_in_degrees.pvd", "compressed") << theta # save temperature to file
+
 
