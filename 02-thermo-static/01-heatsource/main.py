@@ -18,9 +18,8 @@ Material model: Linear Isotropic heat conduction
 
 Main learnings:
 
-Weak Formulation of Heat Conduction - Definition of weak form for heat conduction problems
+Weak Formulation of Heat Conduction 
 Spatial Coordinate - Usage of spatial coordinates for defining expressions over the domain
-ROTATION BCs - Definition and application of rotational Dirichlet boundary conditions
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
 """
