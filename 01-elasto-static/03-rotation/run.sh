@@ -16,7 +16,7 @@ cd ..
 cd ..
 
 # 2. Run main.py
-cd 01-elasto-static/01-tractions
+cd 01-elasto-static/03-rotation
 
 echo "Running the LKM demo..."
 conda run -n fenics-lkm-env python main.py

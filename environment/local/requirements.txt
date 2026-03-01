@@ -1,0 +1,15 @@
+fenics-dijitso 
+fenics-dolfin 
+fenics-ffc 
+fenics-fiat 
+fenics-ufl 
+gmpy2 
+mpi4py 
+mpmath 
+numpy 
+petsc4py 
+pkgconfig 
+pybind11 
+pybind11_global 
+slepc4py 
+sympy 

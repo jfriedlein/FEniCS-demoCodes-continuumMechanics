@@ -16,13 +16,13 @@ cd ..
 cd ..
 
 # 2. Run main.py
-cd 01-elasto-static/01-tractions
+cd 03-thermo-elasto-static/01-sunshine
 
 echo "Running the LKM demo..."
 conda run -n fenics-lkm-env python main.py
 
 if [ $? -eq 0 ]; then
-    echo "Done! Check displacement.pvd and stress.pvd files."
+    echo "Done! Check displacement.pvd, temperature.pvd and stress.pvd files."
 else
     echo "ERROR: The LKM demo failed to run. Check the error messages above."
 fi

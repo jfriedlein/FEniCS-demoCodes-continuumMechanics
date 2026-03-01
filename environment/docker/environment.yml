@@ -8,5 +8,5 @@ dependencies:
   - fenics-ffc
   - fenics-fiat
   - fenics-dijitso
-  #- paraview
+  - paraview=6.0.1
   
