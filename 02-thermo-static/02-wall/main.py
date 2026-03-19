@@ -16,10 +16,11 @@ Loads:
     
 
 Analysis type: Quasi-static model
-Material model: Linear Isothermal Isotropic heat conduction
+Material model: Linear Isotropic heat conduction
 
-
-Main learnings:
+Possibilities for extensions:
+heat convection and radiation to environment"
+transient analysis
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
 """
@@ -131,4 +132,10 @@ solve(a == l, theta, bcs=bcs,
 theta.rename("theta", "temperature") # rename temperature for output
 File("temperature_in_degrees.pvd", "compressed") << theta # save temperature to file
 
+# Save heat flux
+q_p_projected = project(q_p, V)
+q_p_projected.rename("Prescribed_Flux", "q")
+File("prescribed_flux.pvd") << q_p_projected
+
+#-----------------------------------------------------------------------------------------------------------
 

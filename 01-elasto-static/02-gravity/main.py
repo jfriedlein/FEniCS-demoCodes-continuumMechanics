@@ -9,7 +9,7 @@ Loads:
     -No surface traction is applied
     -body forces are applied (gravity load in negative y direction)
 Analysis type: Quasi-static model
-Material model: Linear, Isothermal, Isotropic elasticity
+Material model: Linear Isotropic elasticity
 
 Main learnings:
 GRAVITY LOADS - Implementation of body forces in the variational formulation
@@ -75,18 +75,18 @@ E = 200.e9  # Young's modulus in Pascals
 rho = 8.e3  # density in kg/m^3
 g = 9.81    # acceleration due to gravity in m/s^2
 nu = 0.3    # Poisson's ratio
-mu    = E/(2.0*(1.0 + nu)) # Lamé's second parameter (μ), commonly called the shear modulus; 
-lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu)) # Lamé's first parameter (λ); (see Lamé parameters — Wikipedia https://en.wikipedia.org/wiki/Lam%C3%A9_parameters)
+mu    = E/(2.0*(1.0 + nu)) # Lamé's second parameter (μ), commonly called the shear modulus; # Pascals
+lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu)) # Lamé's first parameter (λ); # Pascals (see Lamé parameters — Wikipedia https://en.wikipedia.org/wiki/Lam%C3%A9_parameters)
 
 
 #--------------------------------------------------------------------------------------------------------
 # Loads and boundary conditions
 #--------------------------------------------------------------------------------------------------------
 
-# Volume force 
+# Volume force (N/m^3)
 b = Constant((0.0, -rho*g, 0.0))
 
-#prescribed tractions
+#prescribed tractions # Pascals
 t_p = Constant((0.0, 0.0, 0.0))  
 
 # Define Dirichlet boundary conditions

@@ -9,7 +9,7 @@ Problem description:
 Geometry: Rectangular solid with dimensions 0.03 x 0.002 x 0.005
 Boundary conditions:
 	-Left face is fully clamped
-	-All faces are held at 25 degree Celsius
+	-All faces are held at 25 K
       
 Loads:
 	- No surface traction is applied
@@ -96,8 +96,8 @@ E = 200.e9 # Young's modulus in Pascals
 rho = 8.e3 # density in kg/m^3
 g = 9.81 # acceleration due to gravity in m/s^2
 nu = 0.3 # Poisson's ratio
-mu    = E/(2.0*(1.0 + nu)) # Shear modulus # lame's second parameter
-lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu)) # lame's first parameter
+mu    = E/(2.0*(1.0 + nu)) # Shear modulus # lame's second parameter # Pascals
+lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu)) # lame's first parameter # Pascals
 kappa = 80.0 # thermal conductivity in W/mK
 alpha = 1.0*conditional(lt(x[1], p1[1]/2.0), 1.e-6, 15.0e-6) # thermal expansion coefficient in 1/K
 # alpha = 1.e-6 for lower half, 15.e-6 for upper half
@@ -107,26 +107,29 @@ alpha = 1.0*conditional(lt(x[1], p1[1]/2.0), 1.e-6, 15.0e-6) # thermal expansion
 # Loads and boundary conditions
 #--------------------------------------------------------------------------------------------------------
 
-# Volume force  
+# Volume force in N/m^3
 b = Constant((0.0, 0.0, 0.0))
 
-# heat source 
+# heat source in W/m^3
 r = Constant(0.0)
 
-# prescribed tractions
+# prescribed tractions in Pascals
 t_p = Constant((0.0, 0.0, 0.0))
 
-# prescribed heat fluxes
+# prescribed heat fluxes in W/m^2
 q_p = Constant(0.0)
+
+# reference temperature in Kelvin
+theta_0=0
 
 # Dirichlet boundary conditions
 bcs = [DirichletBC(V.sub(0), Constant((0.0, 0.0, 0.0)), boundaries, left), # fully fixed left face
-       DirichletBC(V.sub(1), Constant(25.0), boundaries, left), # All faces are held at 25 degree Celsius
-       DirichletBC(V.sub(1), Constant(25.0), boundaries, right),
-       DirichletBC(V.sub(1), Constant(25.0), boundaries, bottom),
-       DirichletBC(V.sub(1), Constant(25.0), boundaries, top),
-       DirichletBC(V.sub(1), Constant(25.0), boundaries, back),
-       DirichletBC(V.sub(1), Constant(25.0), boundaries, front)
+       DirichletBC(V.sub(1), Constant(theta_0+25.0), boundaries, left), # All faces are held at 25 Kelvin
+       DirichletBC(V.sub(1), Constant(theta_0+25.0), boundaries, right),
+       DirichletBC(V.sub(1), Constant(theta_0+25.0), boundaries, bottom),
+       DirichletBC(V.sub(1), Constant(theta_0+25.0), boundaries, top),
+       DirichletBC(V.sub(1), Constant(theta_0+25.0), boundaries, back),
+       DirichletBC(V.sub(1), Constant(theta_0+25.0), boundaries, front)
        ]
 
 
@@ -194,6 +197,6 @@ File("stress_in_MPa.pvd", "compressed") << stress # save stress to file
 
 # Create temperature file
 theta.rename("theta", "temperature") # rename temperature for output
-File("temperature_in_degrees.pvd", "compressed") << theta # save temperature to file
+File("temperature_in_Kelvin.pvd", "compressed") << theta # save temperature to file
 
 #------------------------------------------------------------------------------------------------------------------------------------------

@@ -9,7 +9,7 @@ Problem description:
 Geometry: Rectangular solid with dimensions 0.3 x 0.1 x 0.1
 Boundary conditions:
 	-Left  and Right face is fully clamped
-	-Left and Right face are held at 0 degree C
+	-Left and Right face are held at 0 K
       
 Loads:
 	- No surface traction is applied
@@ -27,6 +27,9 @@ Main learnings:
 mesh.ufl_cell() - Usage of mesh.ufl_cell() for defining finite elements on the same cell type as the mesh
 Mixed Function Space - Definition and usage of mixed function spaces for coupled problems
 Defining and Solving variational formulation - Definition of combined variational formulation for coupled thermo-elastic problems
+
+Possibilities for extensions:
+heat convection and radiation to environment
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
 """
@@ -105,8 +108,8 @@ E = 200.e9 # Young's modulus in Pascals
 rho = 8.e3 # density in kg/m^3
 g = 9.81 # acceleration due to gravity in m/s^2
 nu = 0.3 # Poisson's ratio
-mu    = E/(2.0*(1.0 + nu)) # shear modulus # second Lamé parameter
-lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu)) # first Lamé parameter
+mu    = E/(2.0*(1.0 + nu)) # shear modulus # second Lamé parameter # Pascals
+lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu)) # first Lamé parameter # Pascals
 kappa = 80.0 # thermal conductivity in W/(m·K)
 alpha = 15.0e-6 # coefficient of linear thermal expansion in 1/K
 
@@ -115,24 +118,29 @@ alpha = 15.0e-6 # coefficient of linear thermal expansion in 1/K
 # Loads and boundary conditions
 #--------------------------------------------------------------------------------------------------------
 
-# Volume force  
+# Volume force in N/m^3
 b = Constant((0.0, 0.0, 0.0))
 
-# heat source 
+# heat source in W/m^3
 r = Constant(0.0)
 
-# prescribed tractions
+# prescribed tractions in Pascals
 t_p = Constant((0.0, 0.0, 0.0))
 
-# prescribed heat fluxes
+# prescribed heat fluxes in W/m^2
+#if heat flux points inwards (q_p_top), it points opposite to surface normal -> positive heat flux (energy gain for system, system egoistic viewpoint)
+#if heat flux points outwards (q_p_bottom), it points in the direction of the surface normal -> negative heat flux (energy loss from the system's point of view)
 q_p_top = Constant(10000.0) 
 q_p_bottom = Constant(-10000.0)
+
+# reference temperature in Kelvin
+theta_0=0
 
 # Dirichlet boundary conditions
 bcs = [DirichletBC(V.sub(0), Constant((0.0, 0.0, 0.0)), boundaries, left), # fully fixed left face
 	   DirichletBC(V.sub(0), Constant((0.0, 0.0, 0.0)), boundaries, right), # fully fixed right face
-       DirichletBC(V.sub(1), Constant(0.0), boundaries, left), # left face at 0 degree C
-       DirichletBC(V.sub(1), Constant(0.0), boundaries, right), # right face at 0 degree C
+       DirichletBC(V.sub(1), Constant(theta_0), boundaries, left), # left face at 0 Kelvin
+       DirichletBC(V.sub(1), Constant(theta_0), boundaries, right), # right face at 0 Kelvin
        #DirichletBC(V.sub(1), Constant(20.0), boundaries, bottom),
        #DirichletBC(V.sub(1), Constant(20.0), boundaries, top),
        #DirichletBC(V.sub(1), Constant(20.0), boundaries, back),
@@ -207,7 +215,7 @@ File("stress_in_MPa.pvd", "compressed") << stress # save stress to file
 
 # Create temperature file
 theta.rename("theta", "temperature") # rename temperature for output
-File("temperature_in_degrees.pvd", "compressed") << theta # save temperature to file
+File("temperature_in_Kelvin.pvd", "compressed") << theta # save temperature to file
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------
 

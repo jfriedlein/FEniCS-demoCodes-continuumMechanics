@@ -17,7 +17,8 @@ Material model: Linear Isotropic elastic material
 
 Main learnings:
 
-create and refine an L-shape mesh
+sharp corners cause singularities
+singularities cause infinite stress (cannot be evaluated or interpreted)
 
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -99,8 +100,8 @@ E = 200.e9 # Young's modulus in Pascals
 nu = 0.3 # Poisson's ratio
 #mu    = E/(2.0*(1.0 + nu))
 #lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu))
-mu    = E/(2.0*(1.0 + nu)) #PLANE STRESS # shear modulus # lame second parameter
-lmbda = E*nu/((1.0 + nu)*(1.0 - nu)) #PLANE STRESS # lame first parameter
+mu    = E/(2.0*(1.0 + nu)) #PLANE STRESS # shear modulus # lame second parameter # Pascals
+lmbda = E*nu/((1.0 + nu)*(1.0 - nu)) #PLANE STRESS # lame first parameter #Pascals
 
 #rho = 8.e3
 #g = 9.81
@@ -109,13 +110,13 @@ lmbda = E*nu/((1.0 + nu)*(1.0 - nu)) #PLANE STRESS # lame first parameter
 # Loads and boundary conditions
 #--------------------------------------------------------------------------------------------------------
 
-# Volume force
+# Volume force in N/m^3
 b = Constant((0.0, 0.0))
 
-# prescribed tractions
+# prescribed tractions in Pascals
 t_p = Constant((1.e6, -1.e6)) 
 
-# Dirichlet boundary conditions
+# Dirichlet boundary conditions 
 bcs = [DirichletBC(V, Constant((0.0, 0.0)), boundaries, top) # fixed top edge
        ]
 

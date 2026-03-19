@@ -2,10 +2,10 @@ from paraview.simple import *
 
 # 1. Load the FEniCS output files
 # Using the exact filenames from your FEniCS script
-temp_pvd = PVDReader(registrationName='Temperature', FileName='temperature_in_degrees.pvd')
+temp_xdmf =  XDMFReader(registrationName='Temperature', FileNames='temperature_in_degrees.xdmf')
 
 # IMPORTANT: Force ParaView to actually read the files
-temp_pvd.UpdatePipeline()
+temp_xdmf.UpdatePipeline()
 
 
 # 5. Save the state for manual inspection

@@ -9,7 +9,7 @@ parameters["form_compiler"]["optimize"] = True
 
 
 """-------------------------------------------------2D Elastodynamics of a Rectangular Solid--------------------------------------------------
-Problem description: time ddependent prescribed traction
+Problem description: time dependent prescribed traction
 
 Geometry: Rectangular solid with dimensions 0.4 m x 0.1 m
 Boundary conditions:
@@ -19,16 +19,15 @@ Loads:
    - No body forces are considered for 2D
 
 Analysis type: Quasi-static model
-Material model: Linear, Isothermal, Isotropic elasticity
-
+Material model: Linear Isotropic elasticity
 
 Main Learnings:
-
 Newmark method
 Newmark predictors
 Newmark approximations for rates
 variational formulation - weak form (newmark)
-Performing time integration and function solving        
+Performing time integration and function solving      
+Writing XDMF files -allows large transient datasets to be efficiently stored and visualized in ParaView.
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
 """
@@ -122,20 +121,20 @@ E = 200.e9 # Young's modulus in Pascals
 nu = 0.3 # Poisson's ratio 
 #mu    = E/(2.0*(1.0 + nu)) 
 #lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu))
-mu    = E/(2.0*(1.0 + nu)) #PLANE STRESS # shear modulus # lame second parameter
-lmbda = E*nu/((1.0 + nu)*(1.0 - nu)) #PLANE STRESS  # lame first parameter
+mu    = E/(2.0*(1.0 + nu)) #PLANE STRESS # shear modulus # lame second parameter #Pascals
+lmbda = E*nu/((1.0 + nu)*(1.0 - nu)) #PLANE STRESS  # lame first parameter #Pascals
 
 rho = 8.e3 # density in kg/m^3
 g = 9.81 # gravitational acceleration in m/s^2
 
-# Volume force 
-b = Constant((0.0, 0.0)) 
+# Volume force in N/m^3
+b = Constant((0.0, 0.0))  
 
 #b = as_vector((0.0, -rho*g)) #if volume forces are considered
 
 # Expression for prescribed tractions
 
-# Expression is written such that traction increases linearly to a maximum value at t=t1 and then becomes zero for t>t1
+# Expression is written such that traction increases linearly to a maximum value at t=t1 and then becomes zero for t>t1 #in Pascals
 t_p = Expression(('(t<1.0*t1)?1.0*(-m/t1*fabs(t-t1)+m):0.0', '(t<1.0*t1)?-0.1*(-m/t1*fabs(t-t1)+m):0.0'), degree=1, t1=0.3333*T, m=1.e6, t=0) # time-dependent traction load
 
 #t_p = Expression(('(t<1.0*t1)?0.0*(-m/t1*fabs(t-t1)+m):0.0', '(t<1.0*t1)?-0.9*(-m/t1*fabs(t-t1)+m):0.0'), degree=1, t1=0.3333*T, m=1.e6, t=0) # alternative load case
@@ -191,9 +190,11 @@ xdmf_stress = XDMFFile("stress_in_MPa.xdmf")
 xdmf_stress.parameters["flush_output"] = True
 xdmf_stress.parameters["functions_share_mesh"] = True
 
+xdmf_u.write(u_n, t)
+xdmf_stress.write(stress_n, t)
 
 #---------------------------------------------------------------------------------------------------------
-# Solve the linear system
+# Time integration and function solving
 #---------------------------------------------------------------------------------------------------------
 
 # assemble bilinear form of variational formulation
@@ -262,3 +263,4 @@ for n in range(num_steps):
     xdmf_u.write(u_n, t) # store displacement at current time step
     xdmf_stress.write(stress_n, t) #store stress at current time step
     
+#-------------------------------------------------------------------------------------------------------------------

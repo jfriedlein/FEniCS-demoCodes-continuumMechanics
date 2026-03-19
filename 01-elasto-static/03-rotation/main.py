@@ -10,12 +10,15 @@ Loads:
 	- No surface traction is applied
 	- No body forces applied
 Analysis type: Quasi-static model
-Material model: Linear Isothermal Isotropic elasticity
+Material model: Linear Isotropic elasticity
 
 
 Main learnings:
-
 ROTATION BCs - Definition and application of rotational Dirichlet boundary conditions
+
+Possbility for extensions:
+Replace constant traction with spatially varying surface loads—e.g., linearly increasing or sinusoidal pressure—combined with gravity and rotational effects.
+
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
 """
@@ -80,18 +83,18 @@ E = 200.e9  # Young's modulus in Pascals
 rho = 8.e3  # density in kg/m^3
 g = 9.81    # acceleration due to gravity in m/s^2
 nu = 0.3    # Poisson's ratio
-mu    = E/(2.0*(1.0 + nu)) # Lamé's second parameter (μ), commonly called the shear modulus; 
-lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu)) # Lamé's first parameter (λ); (see Lamé parameters — Wikipedia https://en.wikipedia.org/wiki/Lam%C3%A9_parameters)
+mu    = E/(2.0*(1.0 + nu)) # Lamé's second parameter (μ), commonly called the shear modulus;  # Pascals
+lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu)) # Lamé's first parameter (λ); # Pascals (see Lamé parameters — Wikipedia https://en.wikipedia.org/wiki/Lam%C3%A9_parameters)
 
 
 #--------------------------------------------------------------------------------------------------------
 # Loads and boundary conditions
 #--------------------------------------------------------------------------------------------------------
 
-# Volume force 
+# Volume force in N/m^3
 b = Constant((0.0, 0.0, 0.0))
 
-# Tractions
+# Tractions in Pascals
 t_p = Constant((0.0, 0.0, 0.0)) 
 
 

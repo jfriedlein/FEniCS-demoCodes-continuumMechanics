@@ -20,6 +20,7 @@ Main learnings:
 
 Weak Formulation of Heat Conduction 
 Spatial Coordinate - Usage of spatial coordinates for defining expressions over the domain
+
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
 """
@@ -67,6 +68,7 @@ p = 2
 # Define function space for temperature field.
 V = FunctionSpace(mesh, "Lagrange", p)
 
+ 
 # Define trial and test functions
 theta = TrialFunction(V) # unknown temperature field to be solved for
 delta_theta = TestFunction(V) # virtual temperature field for the variational formulation
@@ -77,7 +79,7 @@ delta_theta = TestFunction(V) # virtual temperature field for the variational fo
 # Material properties
 #--------------------------------------------------------------------------------------------------------
 
-# thermal conductivity in W/mK
+# thermal conductivity in W/(m-K)
 kappa = 1.0 
 
 
@@ -86,14 +88,14 @@ kappa = 1.0
 # Loads and boundary conditions
 #--------------------------------------------------------------------------------------------------------
 
-# heat source term
-r = Expression("100000.0*exp(-((x[0]-0.1)*(x[0]-0.1)+(x[1]-0.033)*(x[1]-0.033))/0.0001)", degree=4)
+# heat source term in W/(m^3)
+r = Expression("100000.0*exp(-((x[0]-0.1)*(x[0]-0.1)+(x[1]-0.033)*(x[1]-0.033))/0.0001)", degree=4) 
 # r is a localized heat source
 # Has a maximum value of 100,000 at x0i = (0.1, 0.033)
 # rapidly decays away from that point
 # degree=4 controls the interpolation accuracy of the Expression.
 
-# prescribed heat flux in W/m2
+# prescribed heat flux in W/(m^2)
 q_p = Constant(1.0)
 
 
@@ -120,6 +122,7 @@ l = r*delta_theta*dx + q_p*delta_theta*ds(right)
 # Solution function to store temperature field
 theta = Function(V)
 
+
 # Solve Ku = f using the direct MUMPS solver
 solve(a == l, theta, bcs=bcs, 
 	      solver_parameters={"linear_solver": "mumps"},
@@ -132,6 +135,11 @@ solve(a == l, theta, bcs=bcs,
 # Save temperature
 theta.rename("theta", "temperature") # rename temperature for output
 File("temperature_in_degrees.pvd", "compressed") << theta # save temperature to file
+
+# Save heat flux
+q_p_projected = project(q_p, V)
+q_p_projected.rename("Prescribed_Flux", "q")
+File("prescribed_flux.pvd") << q_p_projected
 
 
 #---------------------------------------------------------------------------------------------------------
