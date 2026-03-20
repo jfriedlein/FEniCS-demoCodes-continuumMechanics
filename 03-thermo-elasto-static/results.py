@@ -5,22 +5,24 @@ from paraview.simple import *
 disp_pvd = PVDReader(registrationName='Displacement', FileName='displacement_in_meters.pvd')
 stress_pvd = PVDReader(registrationName='Stress', FileName='stress_in_MPa.pvd')
 temp_pvd = PVDReader(registrationName='Temperature', FileName='temperature_in_Kelvin.pvd')
+heatflux_pvd= PVDReader(registrationName='Heat Flux', FileName='heat_flux.pvd')
 
 # IMPORTANT: Force ParaView to actually read the files
 disp_pvd.UpdatePipeline()
 stress_pvd.UpdatePipeline()
 temp_pvd.UpdatePipeline()
+heatflux_pvd.UpdatePipeline()
 
 # 2. Append Attributes
 # Merges 'u' (displacement) and 'sigma' (stress) into one object
-merged = AppendAttributes(Input=[disp_pvd, stress_pvd, temp_pvd])
+merged = AppendAttributes(Input=[disp_pvd, stress_pvd, temp_pvd, heatflux_pvd])
 merged.UpdatePipeline()
 
 # 3. Apply Warp By Vector
 # FEniCS names the displacement array 'u'
 warped = WarpByVector(Input=merged)
 warped.Vectors = ['POINTS', 'u']
-warped.ScaleFactor = 5000.0  # Adjust based on expected deformation
+warped.ScaleFactor = 1000.0  # Adjust based on expected deformation
 warped.UpdatePipeline()
 
 # 5. Save the state for manual inspection

@@ -199,4 +199,16 @@ File("stress_in_MPa.pvd", "compressed") << stress # save stress to file
 theta.rename("theta", "temperature") # rename temperature for output
 File("temperature_in_Kelvin.pvd", "compressed") << theta # save temperature to file
 
+# Compute and save heat flux
+V_flux = VectorFunctionSpace(mesh, "Lagrange", 1)
+
+# Compute heat flux q = -kappa * grad(theta)
+q = project(-kappa*grad(theta), V_flux)
+
+# Rename for output
+q.rename("heat_flux", "q")
+
+# Save heat flux field
+File("heat_flux.pvd") << q
+
 #------------------------------------------------------------------------------------------------------------------------------------------

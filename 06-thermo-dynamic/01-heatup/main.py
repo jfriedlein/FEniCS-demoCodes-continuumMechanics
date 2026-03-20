@@ -141,6 +141,11 @@ bcs = [DirichletBC(V, Constant(25.0), boundaries, left)] # set temperature to 25
 def dtheta(th, th_pred): 
 	return (th-th_pred)/(dt*cn_alpha) 
 
+
+ # Define a vector function space to store the heat flux
+V_flux = VectorFunctionSpace(mesh, "Lagrange", 1)
+q_actual = Function(V_flux) # predefine the heat flux function
+ 
 # Form definition (F(u, delta_u) = a(u, delta_u) - l(delta_u))
 # F= internal energy rate + Fourier's heat conduction + volumetric heat source - prescribed heat flux on the right boundary 
 F = cv*dtheta(theta, theta_pred)*delta_theta*dx \
@@ -156,7 +161,15 @@ xdmf_theta.parameters["flush_output"] = True # ensures that data is written to f
 xdmf_theta.parameters["functions_share_mesh"] = True # allows multiple functions to share the same mesh in the output file, reducing file size and improving performance when writing multiple functions defined on the same mesh
 xdmf_theta.write(theta_n, t)
 
+# Rename for visualization
+q_actual.rename("HeatFlux", "q")
 
+# Save to file ( XDMF)
+File("heat_flux.pvd", "compressed") << q_actual
+xdmf_q = XDMFFile("heat_flux.xdmf")
+xdmf_q.parameters["flush_output"] = True
+xdmf_q.parameters["functions_share_mesh"] = True
+xdmf_q.write(q_actual, t)
 #---------------------------------------------------------------------------------------------------------
 # Time integration and function solving
 #---------------------------------------------------------------------------------------------------------
@@ -221,7 +234,10 @@ for n in range(num_steps):
     # Update the temperature at the previous time step (theta_n) to the current temperature (theta) for use in the next iteration of the time-stepping loop.
     theta_n.vector()[:] = theta.vector()    
     
+    # Compute actual heat flux after updating theta_n
+    q_actual.assign(project(-kappa*grad(theta_n), V_flux)) 
+
     # Write step to files
     xdmf_theta.write(theta_n, t)
-
+    xdmf_q.write(q_actual, t)
 #-----------------------------------------------------------------------------------

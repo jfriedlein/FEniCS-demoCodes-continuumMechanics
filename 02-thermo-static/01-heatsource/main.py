@@ -137,9 +137,16 @@ theta.rename("theta", "temperature") # rename temperature for output
 File("temperature_in_degrees.pvd", "compressed") << theta # save temperature to file
 
 # Save heat flux
-q_p_projected = project(q_p, V)
-q_p_projected.rename("Prescribed_Flux", "q")
-File("prescribed_flux.pvd") << q_p_projected
+V_flux = VectorFunctionSpace(mesh, "Lagrange", 1)
+
+# Compute heat flux q = -kappa * grad(theta)
+q = project(-kappa*grad(theta), V_flux)
+
+# Rename for output
+q.rename("heat_flux", "q")
+
+# Save heat flux field
+File("heat_flux.pvd") << q
 
 
 #---------------------------------------------------------------------------------------------------------

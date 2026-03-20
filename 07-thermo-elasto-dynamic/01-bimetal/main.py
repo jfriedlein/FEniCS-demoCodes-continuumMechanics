@@ -196,9 +196,13 @@ F = rho*dot(delta_u, a(u, u_pred))*dx \
 	- r*delta_theta*dx - q_p*delta_theta*ds(top)
 
 # Project initial stress field
-#V_stress = TensorFunctionSpace(mesh, "Lagrange", p)
-#stress_n = Function(V_stress)
-#stress_n = project(sigma(u_n, theta_n)/1.e6, V_stress, solver_type="mumps")
+V_stress = TensorFunctionSpace(mesh, "Lagrange", p)
+stress_n = Function(V_stress)
+stress_n = project(sigma(u_n, theta_n)/1.e6, V_stress, solver_type="mumps")
+
+# Define a vector function space to store the heat flux
+V_flux = VectorFunctionSpace(mesh, "Lagrange", 1)
+q_actual=Function(V_flux)
 
 # Create output files
 u_n.rename("u", "displacement") # rename the function u_n to "u" 
@@ -207,13 +211,24 @@ xdmf_u.parameters["flush_output"] = True # ensures that data is written to file 
 xdmf_u.parameters["functions_share_mesh"] = True # allows multiple functions to share the same mesh in the output file, reducing file size and improving performance when writing multiple functions defined on the same mesh
 xdmf_u.write(u_n, t)
 
+theta_n.rename("theta","temperature")
 xdmf_theta = XDMFFile("temperature_in_Kelvin.xdmf")
 xdmf_theta.parameters["flush_output"] = True # ensures that data is written to file immediately after each write call
 xdmf_theta.parameters["functions_share_mesh"] = True # allows multiple functions to share the same mesh in the output file, reducing file size and improving performance when writing multiple functions defined on the same mesh
 xdmf_theta.write(theta_n, t)
-#stress_n.rename("stress","vonMises")
-#xdmf_stress = XDMFFile("stress.xdmf")
-#xdmf_stress.write(stress_n, t)
+stress_n.rename("stress","vonMises")
+xdmf_stress = XDMFFile("stress.xdmf")
+xdmf_stress.write(stress_n, t)
+
+# Rename for visualization
+q_actual.rename("HeatFlux", "q")
+
+# Save to file ( XDMF)
+File("heat_flux.pvd", "compressed") << q_actual
+xdmf_q = XDMFFile("heat_flux.xdmf")
+xdmf_q.parameters["flush_output"] = True
+xdmf_q.parameters["functions_share_mesh"] = True
+xdmf_q.write(q_actual, t)
 
 #---------------------------------------------------------------------------------------------------------
 # Time integration and function solving
@@ -278,11 +293,14 @@ for n in range(num_steps):
     theta_n.vector()[:] = theta.vector() # update temperature for the next time step
     
     # Project stresses
-#    stress_n.assign(project(sigma(u_n, theta_n)/1.e6, V_stress, solver_type="mumps"))
+    stress_n.assign(project(sigma(u_n, theta_n)/1.e6, V_stress, solver_type="mumps"))
     
+    # Compute the actual heat flux vector field
+    q_actual = project(-kappa*grad(theta_n), V_flux) 
+
     # Write step to files
     xdmf_u.write(u_n, t) # write the updated displacement u_n to the XDMF file for displacement.
-    xdmf_theta.write(theta_n, t) # write the updated temperature theta_n to the XDMF file for temperature.
-#   xdmf_stress.write(stress_n, t)
-
+    xdmf_theta.write(theta_n, t) # write the updated temperature,stress and heat flux to the XDMF file for temperature.
+    xdmf_stress.write(stress_n, t)
+    xdmf_q.write(q_actual, t)
 #------------------------------------------------------------------------------------------------------------------------------------------
