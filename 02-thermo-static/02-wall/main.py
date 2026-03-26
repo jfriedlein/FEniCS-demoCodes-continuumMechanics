@@ -7,8 +7,8 @@ Problem description: non homogenous heat conduction coefficient
 
 Geometry: Rectangular solid with dimensions 0.30 x 0.10 x 0.10
 Boundary conditions:
-	- Left face is held at 25 degree C
-	- Right face is held at -10 degree C
+	- Left face is held at 25 °C
+	- Right face is held at -10 °C
 	
 Loads:
 	- No prescribed heat flux
@@ -19,8 +19,11 @@ Analysis type: Quasi-static model
 Material model: Linear isotropic heat conduction
 
 Possibilities for extensions:
-heat convection and radiation to environment
-transient analysis
+    - heat convection and radiation to environment
+        - note: radiation must use absolute temperature (Kelvin)
+        - study change in heat flux due to heat losses by convection and radiation
+        - compare to analytical results
+    - transient analysis
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
 """
@@ -96,8 +99,8 @@ q_p = Constant(0.0)
 
 
 # Dirichlet boundary conditions
-bcs = [DirichletBC(V, Constant((25.0)), boundaries, left),  # Left face is held at 25 degree C
-	   DirichletBC(V, Constant((-10.0)), boundaries, right)]# Right face is held at -10 degree C 
+bcs = [DirichletBC(V, Constant((25.0)), boundaries, left),   # Left face is held at 25 °C
+	   DirichletBC(V, Constant((-10.0)), boundaries, right)] # Right face is held at -10 °C 
 
 #---------------------------------------------------------------------------------------------------------
 #  Variational formulation (weak form of heat conduction)
