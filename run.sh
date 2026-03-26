@@ -4,8 +4,11 @@
 BASE_DIR=$(pwd)
 
 echo "Current Root: $BASE_DIR"
-echo "Enter the relative path to the folder (e.g., 01-elasto-static/01-tractions):"
-read script_path
+#echo "Enter the relative path to the folder (e.g., 01-elasto-static/01-tractions):"
+#read script_path
+
+script_path=$(python3 exampleSelector.py)
+echo "Selected example: $script_path"
 
 # 2. Define the absolute path to the target folder
 TARGET_DIR="$BASE_DIR/$script_path"
