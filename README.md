@@ -6,6 +6,7 @@ This project demonstrates 3D linear elasticity using Python and FEniCS.
 
 ## Project Structure
 
+```
 FENICS-LINEAR-CONTINUUM/
 ├── environment/
 │   ├── docker/                 # REPRODUCIBILITY: Container configuration for running simulations in Docker
@@ -32,6 +33,7 @@ FENICS-LINEAR-CONTINUUM/
 ├── README.md                   # DOCUMENTATION: Project overview, setup instructions, and usage guide
 │
 └── run.sh                      # EXECUTION SCRIPT: Helper script to run selected simulation modules
+```
 
 ### Prerequisites
 - **Install Docker**: (https://docs.docker.com/desktop/setup/install/linux/ubuntu/#install-docker-desktop)
@@ -100,4 +102,11 @@ bash run.sh
 3. Select: **view_results.pvsm**
 4. Examine displacement and stress visualizations
 
+## Further links
+* https://bleyerj.github.io/comet-fenicsx/
+* https://comet-fenics.readthedocs.io/en/latest/intro.html
+* https://comet-fenics.readthedocs.io/en/latest/demo/elasticity/2D_elasticity.py.html
 
+## Acknowledgement
+The original source code was developed by Jan Friederich.
+Restructuring, clean-up, documentation, and extensions have been developed by Sudershan Reddy Nagireddy.
