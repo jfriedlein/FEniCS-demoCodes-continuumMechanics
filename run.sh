@@ -5,7 +5,9 @@ BASE_DIR=$(pwd)
 
 echo "Current Root: $BASE_DIR"
 echo "Enter the relative path to the folder (e.g., 01-elasto-static/01-tractions):"
-read script_path
+# "-e" allows to use auto-completion when typing the path using TAB-key
+# @todo Maybe use minimal GUI to ease folder selection and start
+read -e script_path
 
 # 2. Define the absolute path to the target folder
 TARGET_DIR="$BASE_DIR/$script_path"
@@ -25,18 +27,32 @@ if [[ "$input" == "y" || "$input" == "Y" ]]; then
     
     IMAGE_NAME="fenics-tool-offline:v1"
 
-    echo "[STEP 1] Loading Docker image if needed..."
+    echo "[STEP 1/4] Start Docker-Desktop if installed and not already running..."
+    if [ -d "/opt/docker-desktop" ]; then
+        ( exec 1> >(sed 's/^/  /') 2> >(sed 's/^/  /' >&2); # to indent the text output coming from within code block ( ... )
+        docker desktop start
+        # @todo How to keep docker desktop GUI in the background?
+        # @todo Maybe add some checks and message (if fails, docker is not installed)
+        echo "Waiting for Docker to be ready (may take several seconds)..."
+        until docker info >/dev/null 2>&1; do
+          sleep 1
+        done
+        echo "...Docker is ready."
+        )
+    fi
+
+    echo "[STEP 2/4] Loading Docker image if needed (first time: may a minute)..."
     docker image inspect $IMAGE_NAME >/dev/null 2>&1 || docker load -i "$BASE_DIR/environment/docker/fenics_tool.tar"
 
     # [CRITICAL CHANGE]
     # We mount $TARGET_DIR directly to /app. 
     # This means Python's "current directory" inside Docker is your subfolder.
     
-    echo "[STEP 2] Running Simulation (Files will save to $script_path)..."
+    echo "[STEP 3/4] Running Simulation (Files will save to $script_path)..."
     docker run --rm -v "$TARGET_DIR":/app $IMAGE_NAME conda run -n fenics-lkm-env python /app/main.py
     
     if [ $? -eq 0 ]; then
-        echo "[STEP 3] Running ParaView results..."
+        echo "[STEP 4/4] Running ParaView results..."
         docker run --rm -v "$TARGET_DIR":/app -v "$PARENT_DIR":/scripts -w /app  $IMAGE_NAME conda run -n fenics-lkm-env pvbatch /scripts/results.py
         echo "Done! Files are saved in: $script_path"
     else 
