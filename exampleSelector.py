@@ -175,10 +175,10 @@ class App:
     def select_example(self, topic, example):
         """Callback when an example is clicked; outputs the relative path."""
         relative_path = os.path.join(topic, example).replace("\\", "/")  # normalize
-        messagebox.showinfo(
-            "Selected Path",
-            f"Selected relative path:\n{relative_path}"
-        )
+        #messagebox.showinfo(
+        #    "Selected Path",
+        #    f"Selected relative path:\n{relative_path}"
+        #)
         #print(f"Selected relative path: {relative_path}")
         print(relative_path)      # <-- this is what Bash will capture
         self.root.quit()          # close GUI
