@@ -15,3 +15,7 @@
 
 *.avi
 10-plate/dealii_extension/
+/envGUI/
+/test/
+/Upload/
+/Bup_OoO/
