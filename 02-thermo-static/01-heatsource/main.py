@@ -6,14 +6,14 @@ Problem description: prescribed heat flux and heat source
 
 Geometry: Rectangular solid with dimensions 0.30 x 0.10 x 0.10
 Boundary conditions:
-	-Left face is held at 0 degree Celsius
+	- Left face is held at 0 degree Celsius
 	
 Loads:
 	- Prescribed heat flux is applied on the right face
 	- A volumetric heat source is applied over the domain
 
 Analysis type: Quasi-static model
-Material model: Linear Isotropic heat conduction
+Material model: Linear isotropic heat conduction
 
 
 Main learnings:
@@ -33,7 +33,7 @@ Spatial Coordinate - Usage of spatial coordinates for defining expressions over 
 dim = 3 
 
 # Define opposite corners of the rectangular domain
-p0 = Point(0.0, 0.0, 0.0) #	bottom-left front corner
+p0 = Point(0.0, 0.0, 0.0)     # bottom-left front corner
 p1 = Point(0.30, 0.10, 0.10)  # top-right back corner
 mesh = BoxMesh(p0, p1, 30, 10, 10) # Create a structured mesh of the rectangular solid
 
@@ -79,10 +79,8 @@ delta_theta = TestFunction(V) # virtual temperature field for the variational fo
 # Material properties
 #--------------------------------------------------------------------------------------------------------
 
-# thermal conductivity in W/(m-K)
+# thermal conductivity in W/(m K)
 kappa = 1.0 
-
-
 
 #--------------------------------------------------------------------------------------------------------
 # Loads and boundary conditions
@@ -110,7 +108,7 @@ bcs = [DirichletBC(V, Constant((0.0)), boundaries, left),    # left face at 0.0 
 # left-hand side of the variational formulation
 a = kappa*dot(grad(delta_theta), grad(theta))*dx  #see Pg 148 LKM Slides
 
-# linear form: volumetric heat source+ boundary heat flux 
+# linear form: volumetric heat source + boundary heat flux 
 # right-hand side of the variational formulation
 l = r*delta_theta*dx + q_p*delta_theta*ds(right)
 
@@ -123,7 +121,7 @@ l = r*delta_theta*dx + q_p*delta_theta*ds(right)
 theta = Function(V)
 
 
-# Solve Ku = f using the direct MUMPS solver
+# Solve K u = f using the direct MUMPS solver
 solve(a == l, theta, bcs=bcs, 
 	      solver_parameters={"linear_solver": "mumps"},
 	      form_compiler_parameters={"optimize": True}) # solve the variational problem
