@@ -9,7 +9,7 @@ Loads:
     -No surface traction is applied
     -body forces are applied (gravity load in negative y direction)
 Analysis type: Quasi-static model
-Material model: Linear Isotropic elasticity
+Material model: Linear isotropic elasticity
 
 Main learnings:
 GRAVITY LOADS - Implementation of body forces in the variational formulation
@@ -24,8 +24,8 @@ GRAVITY LOADS - Implementation of body forces in the variational formulation
 dim = 3 
 
 # Define opposite corners of the rectangular domain
-p0 = Point(0.0, 0.0, 0.0) #	bottom-left front corner
-p1 = Point(3.0, 1.0, 1.0)  #top-right back corner
+p0 = Point(0.0, 0.0, 0.0)  # bottom-left front corner
+p1 = Point(3.0, 1.0, 1.0)  # top-right back corner
 mesh = BoxMesh(p0, p1, 30, 10, 10) # Create a structured mesh of the rectangular solid
 
 #---------------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu)) # Lamé's first parameter (λ); # Pasca
 # Volume force (N/m^3)
 b = Constant((0.0, -rho*g, 0.0))
 
-#prescribed tractions # Pascals
+# Prescribed tractions # Pascals
 t_p = Constant((0.0, 0.0, 0.0))  
 
 # Define Dirichlet boundary conditions
@@ -105,10 +105,10 @@ def sigma(u):
     return lmbda*tr(epsilon(u))*Identity(dim) + 2.0*mu*epsilon(u) # stress tensor (see Stress tensor — Wikipedia https://en.wikipedia.org/wiki/Lam%C3%A9_parameters)
 
 
-# Bilinear form:  internal virtual work
+# Bilinear form: internal virtual work
 a = inner(grad(delta_u), sigma(u))*dx
 
-# linear form: external virtual work
+# Linear form: external virtual work
 l = dot(b, delta_u)*dx + dot(t_p, delta_u)*ds(top)
 
 
@@ -120,7 +120,7 @@ l = dot(b, delta_u)*dx + dot(t_p, delta_u)*ds(top)
 u = Function(V) 
 
 
-# Solve Ku = f using the direct MUMPS solver
+# Solve K u = f using the direct MUMPS solver
 solve(a == l, u, bcs=bcs, 
 	      solver_parameters={"linear_solver": "mumps"},
 	      form_compiler_parameters={"optimize": True}) # solve the variational problem

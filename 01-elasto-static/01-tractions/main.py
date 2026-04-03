@@ -12,7 +12,7 @@ Loads:
    -Surface traction is applied on the top face
    -No body forces
 Analysis type: Quasi-static model
-Material model: Linear Isotropic elasticity
+Material model: Linear isotropic elasticity
 
 Main Learnings:
 
@@ -24,7 +24,7 @@ Function space definition (vector-valued FEM)
 Variational (weak) formulation
 Application of Dirichlet boundary conditions
 Linear solver usage (MUMPS)
-Stress recovery and 
+Stress recovery and output
 
 --------------------------------------------------------------------------------------------------------------------------------------------------
 

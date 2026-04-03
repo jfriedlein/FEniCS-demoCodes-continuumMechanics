@@ -7,19 +7,19 @@ Problem description: non homogenous heat conduction coefficient
 
 Geometry: Rectangular solid with dimensions 0.30 x 0.10 x 0.10
 Boundary conditions:
-	-Left face is held at 25 degree C
-	-Right face is held at -10 degree C
+	- Left face is held at 25 degree C
+	- Right face is held at -10 degree C
 	
 Loads:
-	- No Prescribed heat flux
+	- No prescribed heat flux
 	- No volumetric heat source 
     
 
 Analysis type: Quasi-static model
-Material model: Linear Isotropic heat conduction
+Material model: Linear isotropic heat conduction
 
 Possibilities for extensions:
-heat convection and radiation to environment"
+heat convection and radiation to environment
 transient analysis
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ transient analysis
 dim = 3 
 
 # Define opposite corners of the rectangular domain
-p0 = Point(0.0, 0.0, 0.0) #	bottom-left front corner
+p0 = Point(0.0, 0.0, 0.0)     # bottom-left front corner
 p1 = Point(0.30, 0.10, 0.10)  # top-right back corner
 mesh = BoxMesh(p0, p1, 30, 10, 10) # Create a structured mesh of the rectangular solid
 
@@ -80,18 +80,18 @@ delta_theta = TestFunction(V) # virtual temperature field for the variational fo
 
 # thermal conductivity in W/mK
 kappa = 1.0*conditional(lt(x[0], p1[0]/3.0), 2.0, conditional(lt(x[0], p1[0]*2.0/3.0), 0.3, 1.0))
-# condition: if x> L/3 then kappa=2.0 
-#            else if x< 2L/3 then kappa=0.3 
+# condition: if x < L/3 then kappa=2.0 
+#            else if x < 2L/3 then kappa=0.3 
 #            else kappa=1.0
 
 #--------------------------------------------------------------------------------------------------------
 # Loads and boundary conditions
 #--------------------------------------------------------------------------------------------------------
 
-# heat source 
+# volumetric heat source in W/(m^3)
 r = Constant(0.0) 
 
-# prescribed heat fluxes
+# prescribed heat fluxes in W/(m^2)
 q_p = Constant(0.0)
 
 
@@ -119,7 +119,7 @@ l = r*delta_theta*dx + q_p*delta_theta*ds(top) # l is zero in this case
 # Solution function to store temperature field
 theta = Function(V)
 
-# Solve Ku = f using the direct MUMPS solver
+# Solve K u = f using the direct MUMPS solver
 solve(a == l, theta, bcs=bcs, 
 	      solver_parameters={"linear_solver": "mumps"},
 	      form_compiler_parameters={"optimize": True}) # solve the variational problem
