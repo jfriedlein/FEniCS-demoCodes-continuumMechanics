@@ -5,7 +5,7 @@ BASE_DIR=$(pwd)
 
 echo "Current Root: $BASE_DIR"
 echo "Enter the relative path to the folder (e.g., 01-elasto-static/01-tractions):"
-read script_path
+read -e script_path
 
 # 2. Define the absolute path to the target folder
 TARGET_DIR="$BASE_DIR/$script_path"
@@ -35,14 +35,28 @@ if [[ "$input" == "y" || "$input" == "Y" ]]; then
     echo "[STEP 2] Running Simulation (Files will save to $script_path)..."
     docker run --rm -v "$TARGET_DIR":/app $IMAGE_NAME conda run -n fenics-lkm-env python /app/main.py
     
-    if [ $? -eq 0 ]; then
-        echo "[STEP 3] Running ParaView results..."
-        docker run --rm -v "$TARGET_DIR":/app -v "$PARENT_DIR":/scripts -w /app  $IMAGE_NAME conda run -n fenics-lkm-env pvbatch /scripts/results.py
-        echo "Done! Files are saved in: $script_path"
-    else 
+    if [ $? -ne 0 ]; then
         echo "Simulation failed."
-        exit 1 
+        exit 1
     fi
+
+    #  choose results.py from subfolder first, then root
+    if [[ -f "$TARGET_DIR/results.py" ]]; then
+        RESULTS_LOCAL="$TARGET_DIR/results.py"
+        RESULTS_CONTAINER="/app/results.py"
+        MOUNT_RESULTS="-v $TARGET_DIR:/app"
+    elif [[ -f "$PARENT_DIR/results.py" ]]; then
+        RESULTS_LOCAL="$PARENT_DIR/results.py"
+        RESULTS_CONTAINER="/scripts/results.py"
+        MOUNT_RESULTS="-v $TARGET_DIR:/app -v $PARENT_DIR:/scripts"
+    else
+        echo "ERROR: results.py not found in $TARGET_DIR or parent."
+        exit 1
+    fi
+
+    echo "[STEP 3] Running ParaView results..."
+    docker run --rm $MOUNT_RESULTS -w /app $IMAGE_NAME conda run -n fenics-lkm-env pvbatch $RESULTS_CONTAINER
+    echo "Done! Files are saved in: $script_path"
 
 elif [[ "$input" == "n" || "$input" == "N" ]]; then
     # LOCAL EXECUTION
@@ -55,13 +69,23 @@ elif [[ "$input" == "n" || "$input" == "N" ]]; then
     
     echo "Running locally in $(pwd)..."
     conda run -n fenics-lkm-env python main.py
-    
-    
-    conda run -n fenics-lkm-env pvbatch $BASE_DIR/results.py
-    
-    
+
+    # Step 3: choose results.py from subfolder first, then root
+    if [[ -f "$TARGET_DIR/results.py" ]]; then
+        RESULTS_LOCAL="$TARGET_DIR/results.py"
+    elif [[ -f "$PARENT_DIR/results.py" ]]; then
+        RESULTS_LOCAL="$PARENT_DIR/results.py"
+    else
+        echo "ERROR: results.py not found in $TARGET_DIR or parent."
+        cd "$BASE_DIR"
+        exit 1
+    fi
+
+    echo "[STEP 3] Running ParaView results..."
+    conda run -n fenics-lkm-env pvbatch "$RESULTS_LOCAL"
+
     echo "Done! Files saved in $(pwd)"
-    
+
     # Return to root
     cd "$BASE_DIR"
 fi
