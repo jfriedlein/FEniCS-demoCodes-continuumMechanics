@@ -5,7 +5,7 @@ fenics-fiat
 fenics-ufl 
 gmpy2 
 mpi4py 
-mpmath 
+mpmath
 numpy 
 petsc4py 
 pkgconfig 
