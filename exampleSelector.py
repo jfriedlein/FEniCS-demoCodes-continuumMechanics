@@ -1,195 +1,318 @@
-# powered by perplexity.ai
-
 import os
 import tkinter as tk
-from tkinter import messagebox
-from PIL import Image, ImageTk
+from tkinter import ttk, scrolledtext, messagebox
+import subprocess
+import threading
 import re
+import sys
+import platform
 
-# requires pip install Pillow
+# Image support
+try:
+    from PIL import Image, ImageTk
+    PIL_AVAILABLE = True
+except:
+    PIL_AVAILABLE = False
 
-BASE_DIR = "./"  # script should be called from the main folder (where "run.sh" and "exampleSelector.py" are located)
+# 🔥 Match run.sh root
+BASE_DIR = os.getcwd()
+
+# Detect GUI
+try:
+    root = tk.Tk()
+    root.withdraw()
+    GUI_MODE = True
+except tk.TclError:
+    GUI_MODE = False
+    print("01-elasto-static/01-tractions")
+    sys.exit(0)
 
 
-def load_image(path, max_width=90, max_height=90):
-    """Load and resize an image, preserving aspect ratio, or return None on error."""
+# ---------------- Image Loader ---------------- #
+
+def load_image(path, size=(80, 80)):
+    if not PIL_AVAILABLE:
+        return None
     try:
         img = Image.open(path)
-        img.thumbnail((max_width, max_height), Image.LANCZOS)
+        img.thumbnail(size)
         return ImageTk.PhotoImage(img)
-    except Exception as e:
-        #print(f"Could not load image {path}: {e}")
+    except:
         return None
 
 
-class App:
+# ---------------- MAIN CLASS ---------------- #
+
+class ExampleSelector:
     def __init__(self, root):
         self.root = root
-        self.root.title("Topic & Example Selector")
-        self.root.geometry("700x500")
+        self.root.title("FEniCS Example Selector")
+        self.root.geometry("1000x720")
+        self.root.configure(bg="#f0f0f0")
+        self.root.deiconify()
 
-        # Ensure the base dir exists
-        if not os.path.exists(BASE_DIR):
-            messagebox.showerror(
-                "Error",
-                f"Base directory '{BASE_DIR}' not found.\n"
-                "Please create it as described in the comments."
-            )
-            root.quit()
-            return
+        # 🎨 Style
+        style = ttk.Style()
+        style.theme_use("clam")
 
-        # Start with the topic grid
+        style.configure("Card.TFrame",
+                        background="white",
+                        relief="raised",
+                        borderwidth=1)
+
+        style.configure("TButton",
+                        font=("Arial", 10),
+                        padding=6)
+
+        self.main_frame = ttk.Frame(root, padding=20)
+        self.main_frame.pack(fill=tk.BOTH, expand=True)
+
         self.show_topics()
 
-    def clear_window(self):
-        """Remove all widgets from the window."""
-        for widget in self.root.winfo_children():
-            widget.destroy()
+    # ---------------- Helpers ---------------- #
+
+    def clear(self):
+        for w in self.main_frame.winfo_children():
+            w.destroy()
+
+    def safe_print(self, text):
+        self.root.after(0, lambda: self.output.insert(tk.END, text))
+
+    # ---------------- Topics ---------------- #
 
     def show_topics(self):
-        """Show a grid of topic buttons (only folders starting with '##-')."""
-        self.clear_window()
-        self.root.grid_rowconfigure(0, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
+        self.clear()
 
-        # --- Title bar ---
-        title_frame = tk.Frame(self.root, pady=10)
-        title_frame.grid(row=0, column=0, sticky="nwe")
+        ttk.Label(self.main_frame, text="Select Topic",
+                  font=("Arial", 20, "bold")).pack(pady=10)
 
-        title_label = tk.Label(
-            title_frame,
-            text="Select a topic",
-            font=("Helvetica", 14, "bold"),
-        )
-        title_label.pack(padx=10)
+        frame = ttk.Frame(self.main_frame)
+        frame.pack(fill=tk.BOTH, expand=True)
 
-        # --- Topics grid (no scroll) ---
-        main_frame = tk.Frame(self.root, pady=10)
-        main_frame.grid(row=1, column=0, sticky="nsew")
-
-        # Configure resizing so columns share space
-        cols = 3  # fewer columns → wider but no scrollbar
-        for c in range(cols):
-            main_frame.grid_columnconfigure(c, weight=1)
-
-        # --- Filter only folders that start with two digits + dash ---
-        topics_raw = [
-            name
-            for name in os.listdir(BASE_DIR)
-            if os.path.isdir(os.path.join(BASE_DIR, name))
+        topics = [
+            d for d in os.listdir(BASE_DIR)
+            if os.path.isdir(os.path.join(BASE_DIR, d)) and re.match(r'^\d{2}-', d)
         ]
+        topics.sort()
 
-        pattern = re.compile(r"^\d{2}-")
-        topics = [name for name in topics_raw if pattern.match(name)]
+        cols = 3
+        for i, topic in enumerate(topics):
+            r, c = divmod(i, cols)
 
-        # --- Arrange topic buttons in grid ---
-        for idx, topic in enumerate(topics):
-            row = idx // cols
-            col = idx % cols
+            card = ttk.Frame(frame, style="Card.TFrame", padding=10)
+            card.grid(row=r, column=c, padx=15, pady=15, sticky="nsew")
 
-            frame = tk.Frame(
-                main_frame,
-                relief="raised",
-                borderwidth=2,
-                padx=5,
-                pady=5,
-            )
-            frame.grid(row=row, column=col, padx=5, pady=5, sticky="ew")
+            img = load_image(os.path.join(BASE_DIR, topic, "icon.png"))
+            if img:
+                lbl = ttk.Label(card, image=img)
+                lbl.image = img
+                lbl.pack()
 
-            # Button adapts width to text
-            btn = tk.Button(
-                frame,
-                text=topic,
-                command=lambda t=topic: self.show_examples(t),
-            )
-            btn.pack(expand=True, fill="x", pady=5)
+            ttk.Button(card, text=topic,
+                       command=lambda t=topic: self.open_topic(t)).pack(fill=tk.X)
+
+        for c in range(cols):
+            frame.grid_columnconfigure(c, weight=1)
+
+    # ---------------- Smart Topic ---------------- #
+
+    def open_topic(self, topic):
+        topic_path = os.path.join(BASE_DIR, topic)
+
+        if os.path.exists(os.path.join(topic_path, "main.py")):
+            self.show_run(topic, None)
+        else:
+            self.show_examples(topic)
+
+    # ---------------- Examples ---------------- #
 
     def show_examples(self, topic):
-        """Show examples (subfolders) for the given topic."""
+        self.clear()
+
+        ttk.Button(self.main_frame, text="← Back",
+                   command=self.show_topics).pack(anchor="w")
+
+        ttk.Label(self.main_frame, text=topic,
+                  font=("Arial", 18, "bold")).pack(pady=10)
+
+        frame = ttk.Frame(self.main_frame)
+        frame.pack(fill=tk.BOTH, expand=True)
+
         topic_path = os.path.join(BASE_DIR, topic)
-        self.clear_window()
-        self.root.grid_rowconfigure(0, weight=0)  # title row
-        self.root.grid_rowconfigure(1, weight=1)  # examples grid
-        self.root.grid_columnconfigure(0, weight=1)
-
-        # --- Title bar: selected topic ---
-        title_frame = tk.Frame(self.root, pady=10)
-        title_frame.grid(row=0, column=0, sticky="nwe")
-
-        title_label = tk.Label(
-            title_frame,
-            text=f"Topic: {topic}",
-            font=("Helvetica", 14, "bold"),
-        )
-        title_label.pack(side="left", padx=10)
-
-        # Back button to return to topic selection
-        back_btn = tk.Button(
-            title_frame,
-            text="← Back",
-            command=self.show_topics,
-        )
-        back_btn.pack(side="right", padx=10)
-
-        # --- Examples grid (no scroll) ---
-        main_frame = tk.Frame(self.root, pady=10)
-        main_frame.grid(row=1, column=0, sticky="nsew")
-
-        cols = 3  # fewer columns, better fit in window
-        for c in range(cols):
-            main_frame.grid_columnconfigure(c, weight=1)
 
         examples = [
-            name
-            for name in os.listdir(topic_path)
-            if os.path.isdir(os.path.join(topic_path, name))
+            d for d in os.listdir(topic_path)
+            if os.path.isdir(os.path.join(topic_path, d))
         ]
+        examples.sort()
 
-        for idx, example in enumerate(examples):
-            row = idx // cols
-            col = idx % cols
+        cols = 4
+        for i, ex in enumerate(examples):
+            r, c = divmod(i, cols)
 
-            frame = tk.Frame(
-                main_frame,
-                relief="raised",
-                borderwidth=2,
-                padx=5,
-                pady=5,
-            )
-            frame.grid(row=row, column=col, padx=5, pady=5, sticky="ew")
+            card = ttk.Frame(frame, style="Card.TFrame", padding=10)
+            card.grid(row=r, column=c, padx=10, pady=10, sticky="nsew")
 
-            icon_path = os.path.join(topic_path, example, "icon.png")
-            img = load_image(icon_path, max_width=90, max_height=90)
+            img = load_image(os.path.join(topic_path, ex, "icon.png"))
             if img:
-                img_label = tk.Label(frame, image=img)
-                img_label.image = img  # Keep a reference
-                img_label.pack(pady=2)
+                lbl = ttk.Label(card, image=img)
+                lbl.image = img
+                lbl.pack()
 
-            btn = tk.Button(
-                frame,
-                text=example,
-                command=lambda ex=example, t=topic: self.select_example(t, ex),
+            ttk.Button(card, text=ex,
+                       command=lambda e=ex: self.show_run(topic, e)).pack(fill=tk.X)
+
+        for c in range(cols):
+            frame.grid_columnconfigure(c, weight=1)
+
+    # ---------------- Run Screen ---------------- #
+
+    def show_run(self, topic, example):
+        self.clear()
+
+        back_cmd = self.show_topics if example is None else lambda: self.show_examples(topic)
+
+        ttk.Button(self.main_frame, text="← Back",
+                   command=back_cmd).pack(anchor="w")
+
+        label = topic if example is None else f"{topic} / {example}"
+
+        ttk.Label(self.main_frame, text=label,
+                  font=("Arial", 18, "bold")).pack(pady=10)
+
+        self.use_docker = tk.BooleanVar()
+
+        ttk.Checkbutton(self.main_frame, text="Use Docker",
+                        variable=self.use_docker).pack(anchor="w")
+
+        # Buttons
+        btn_frame = ttk.Frame(self.main_frame)
+        btn_frame.pack(pady=10)
+
+        ttk.Button(btn_frame, text="Run Simulation",
+                   command=lambda: self.run(topic, example)).pack(side=tk.LEFT, padx=8)
+
+        ttk.Button(btn_frame, text="Open Results",
+                   command=lambda: self.open_folder(topic, example)).pack(side=tk.LEFT, padx=8)
+
+        ttk.Button(btn_frame, text="Open ParaView",
+                   command=lambda: self.open_paraview(topic, example)).pack(side=tk.LEFT, padx=8)
+
+        # Output
+        self.output = scrolledtext.ScrolledText(self.main_frame, height=20)
+        self.output.pack(fill=tk.BOTH, expand=True)
+
+    # ---------------- Run Logic ---------------- #
+
+    def run(self, topic, example):
+        self.output.delete(1.0, tk.END)
+        threading.Thread(target=self._run_thread,
+                         args=(topic, example), daemon=True).start()
+
+    def _run_thread(self, topic, example):
+        if example is None:
+            script_path = topic
+        else:
+            script_path = f"{topic}/{example}"
+
+        mode = "docker" if self.use_docker.get() else "local"
+
+        try:
+            process = subprocess.Popen(
+                ["bash", "run.sh", script_path, mode],
+                cwd=BASE_DIR,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True
             )
-            btn.pack(expand=True, fill="x", pady=2)
 
-    def select_example(self, topic, example):
-        """Callback when an example is clicked; outputs the relative path."""
-        relative_path = os.path.join(topic, example).replace("\\", "/")  # normalize
-        #messagebox.showinfo(
-        #    "Selected Path",
-        #    f"Selected relative path:\n{relative_path}"
-        #)
-        #print(f"Selected relative path: {relative_path}")
-        print(relative_path)      # <-- this is what Bash will capture
-        self.root.quit()          # close GUI
+            for line in process.stdout:
+                self.safe_print(line)
 
+            process.wait()
+
+            if process.returncode != 0:
+                self.safe_print("\n❌ Failed\n")
+            else:
+                self.safe_print("\n Done\n")
+
+        except Exception as e:
+            self.safe_print(f"Error: {e}\n")
+
+    # ---------------- Open Folder ---------------- #
+
+    def open_folder(self, topic, example):
+        if example is None:
+            base_folder = os.path.join(BASE_DIR, topic)
+        else:
+            base_folder = os.path.join(BASE_DIR, topic, example)
+
+        # detect results folder
+        for name in ["results", "output", "outputs"]:
+            candidate = os.path.join(base_folder, name)
+            if os.path.isdir(candidate):
+                folder = candidate
+                break
+        else:
+            folder = base_folder
+
+        try:
+            if "microsoft" in platform.uname().release.lower():
+                win_path = subprocess.check_output(
+                    ["wslpath", "-w", folder]
+                ).decode().strip()
+                subprocess.run(["explorer.exe", win_path])
+
+            elif platform.system() == "Windows":
+                os.startfile(folder)
+
+            elif platform.system() == "Darwin":
+                subprocess.run(["open", folder])
+
+            else:
+                subprocess.run(["xdg-open", folder])
+
+        except:
+            messagebox.showinfo("Path", folder)
+
+    # ---------------- ParaView ---------------- #
+
+    def open_paraview(self, topic, example):
+        if example is None:
+            folder = os.path.join(BASE_DIR, topic)
+        else:
+            folder = os.path.join(BASE_DIR, topic, example)
+
+        pvsm = [f for f in os.listdir(folder) if f.endswith(".pvsm")]
+
+        if not pvsm:
+            messagebox.showerror("Error", "No .pvsm file found")
+            return
+
+        pvsm_path = os.path.join(folder, pvsm[0])
+
+        try:
+            if "microsoft" in platform.uname().release.lower():
+                win_path = subprocess.check_output(
+                    ["wslpath", "-w", pvsm_path]
+                ).decode().strip()
+
+                subprocess.run(["cmd.exe", "/c", "start", "", win_path])
+
+            else:
+                subprocess.run(["paraview", pvsm_path])
+
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+
+# ---------------- MAIN ---------------- #
 
 def main():
-    root = tk.Tk()
-    app = App(root)
-    root.mainloop()
+    if GUI_MODE:
+        ExampleSelector(root)
+        root.mainloop()
 
 
 if __name__ == "__main__":
     main()
-
