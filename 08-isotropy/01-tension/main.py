@@ -144,7 +144,7 @@ solve(a == l, u, bcs=bcs,
 #---------------------------------------------------------------------------------------------------------
 
 # Create displacement file
-u.rename("u", "displacement") # renam3e displacement for output
+u.rename("u", "displacement") # rename displacement for output
 File("displacement_in_meters.pvd", "compressed") << u # save displacement to file
 
 # Project stress field and create stress file
