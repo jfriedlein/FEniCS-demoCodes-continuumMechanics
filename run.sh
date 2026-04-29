@@ -6,8 +6,18 @@ SCRIPT_PATH=$1
 MODE=$2   # "docker" or "local"
 
 if [[ -z "$SCRIPT_PATH" || -z "$MODE" ]]; then
-    echo "Usage: ./run.sh <path> <docker|local>"
-    exit 1
+    echo "Direct usage: ./run.sh <path> <docker|local>"
+    echo "Starting command line usage ..."
+    echo "Current Root: $BASE_DIR"
+    echo "Enter the relative path to the folder (e.g., 01-elasto-static/01-tractions):"
+    read -e SCRIPT_PATH
+    echo "Do you want to execute in Docker? [y/n]:"
+    read input
+    if [[ "$input" == "y" ]]; then
+        MODE="docker"
+    else
+        MODE="local"
+    fi
 fi
 
 TARGET_DIR="$BASE_DIR/$SCRIPT_PATH"
