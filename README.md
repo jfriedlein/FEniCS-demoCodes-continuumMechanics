@@ -1,112 +1,172 @@
-
-## Use Docker for an isolated, reproducible environment without installing FEniCS locally.
 # Linear Continuum Mechanics (LKM) Demo – FEniCS
 
-This project demonstrates 3D linear elasticity using Python and FEniCS.
+This project provides a collection of 3D linear elasticity simulations using **FEniCS**, with support for both **local execution** and **Docker-based reproducible environments**.
 
-## Project Structure
+It includes a **GUI-based launcher** and a **script-based workflow** to simplify running simulations and visualizing results.
+
+---
+
+# 📁 Project Structure
 
 ```
 FENICS-LINEAR-CONTINUUM/
 ├── environment/
-│   ├── docker/                 # REPRODUCIBILITY: Container configuration for running simulations in Docker
-│   │   ├── environment.yml     # List of required dependencies (FEniCS, ParaView, Python packages)
-│   │   └── fenics.tool.tar     # Prebuilt Docker image or instructions to build/load the container
-│   └── local/                  # LOCAL SETUP: Configuration for running the project on a local machine
-│       └── environment.yml     # Conda/Mamba environment specification for native installation
+│   ├── docker/                 # Docker environment for reproducible runs
+│   │   ├── environment.yml
+│   │   └── fenics_tool.tar
+│   └── local/                  # Local Conda environment
+│       └── environment.yml
 │
-├── 01-elasto-static/           # PHYSICS MODULE: Linear elasticity simulations (static problems)
-│   ├── 01-tractions/           # SCENARIO: Solid subjected to boundary traction forces
-│   │   ├── main.py             # EXECUTION: Defines the FEM problem, boundary conditions, and solver routine
-│   │   ├── results.py          # POST-PROCESSING: Extracts data and generates plots or derived quantities
-│   │   ├── view_results.pvsm   # VISUALIZATION: Saved ParaView state for quick visualization of results
-│   │   └── outputs/            # AUTO-GENERATED: Simulation output files
-│   │       ├── paraview/       # Mesh and solution files (.pvd, .xdmf, .vtu) for visualization, generated after simulation.
-│   │       └── plots/          # Generated figures (PNG/PDF) such as stress fields or convergence plots
+├── 01-elasto-static/
+│   ├── 01-tractions/
+│   │   ├── main.py
+│   │   ├── results.py
+│   │   ├── view_results.pvsm
+│   │   └── outputs/
 │   │
-│   └── 02-gravity/             # SCENARIO: Elastic body subjected to body forces (e.g., gravity/self-weight)
-│       └── ...                 # Follows the same structure as other simulation scenarios
+│   └── 02-gravity/
+│       └── ...
 │
-├── slides/                     # THEORY: Lecture or presentation material related to the simulations
-│   └── lkm-demo.pdf            # Example slide deck describing LKM problems
+├── 04-lshape/                  # Example WITHOUT subfolder (direct execution)
+│   ├── main.py
+│   ├── results.py
+│   ├── *.vtu / *.pvd / *.png
 │
-├── README.md                   # DOCUMENTATION: Project overview, setup instructions, and usage guide
+├── gui.py                      # Graphical interface to browse and run simulations
+├── run.sh                      # Main execution script (used by GUI and CLI)
+├── slides/
+│   └── lkm-demo.pdf
 │
-└── run.sh                      # EXECUTION SCRIPT: Helper script to run selected simulation modules
+└── README.md
 ```
 
-### Prerequisites
-- **Install Docker**: (https://docs.docker.com/desktop/setup/install/linux/ubuntu/#install-docker-desktop)
-- **if Windows**: Install WSL (Ubuntu)
+---
 
-## Docker Workflow
+# 🚀 How to Run
 
-Run the complete workflow (simulation + visualization) inside Docker containers:
+## Option 1 — GUI (Recommended)
+
+Launch the graphical interface:
 
 ```bash
-docker load -i fenics_tool.tar
+python exampleSelector.py
 ```
 
-### Run FEniCS Simulation
+### Features:
+
+* Browse topics and examples visually
+* Supports both:
+
+  * `topic/example/`
+  * `topic/` (direct execution folders)
+* Run simulations (Docker or local)
+* Open results folder
+* Launch ParaView (Windows automatically if using WSL)
+
+---
+
+## Option 2 — Script (CLI)
+
+Run using:
+
 ```bash
-docker run --rm -v $(pwd):/app fenics-tool-offline:v1
+bash run.sh <path> <docker|local>
 ```
-Computes displacement and stress fields for the 3D linear elasticity problem.
 
-### Process Results with ParaView
+### Examples:
+
 ```bash
-docker run --rm -v "$(pwd)":/app fenics-lkm-env conda run -nfenics-lkm-env pvbatch results.py
+bash run.sh 01-elasto-static/01-tractions docker
+bash run.sh 04-lshape local
 ```
-Creates reflected geometry, applies deformation, and generates `view_results.pvsm`.
 
+---
 
-## Local Setup Instructions
+# Docker Workflow (Recommended for reproducibility)
 
-### Prerequisites
+### Load Docker image (first time only)
 
-- **Linux / macOS**: Install Miniconda or Anaconda
-- **Windows**: Install WSL (Ubuntu), then install Miniconda inside WSL
-
-### Installation Steps
-
-1. Create and activate the Conda environment:
 ```bash
-conda env create -f environment.yml
+docker load -i environment/docker/fenics_tool.tar
+```
+
+### Run simulation + visualization
+
+Handled automatically via:
+
+```bash
+bash run.sh <path> docker
+```
+
+---
+
+# 💻 Local Execution
+
+### Setup environment
+
+```bash
+conda env create -f environment/local/environment.yml
 conda activate fenics-lkm-env
 ```
 
-2. Run the FEniCS simulation:
-```bash
-python main.py
-```
+### Run manually by
 
-3. Process results with ParaView:
 ```bash
-conda install -c conda-forge paraview
+cd <example-folder>
+python main.py
 pvbatch results.py
 ```
 
+---
 
-## Quick Start
+# 📊 Results & Visualization
 
-Use the provided script to run all steps automatically:
+After execution:
 
-```bash
-bash run.sh
-```
+* Results are saved in:
 
-## Viewing Results
+  * `outputs/`, `results/`, or directly in the example folder
+* Visualization file:
 
-1. Open ParaView on your local machine
-2. Go to: **File → Load State**
-3. Select: **view_results.pvsm**
-4. Examine displacement and stress visualizations
+  * `view_results.pvsm`
 
-## Further links
-* https://bleyerj.github.io/comet-fenicsx/
-* https://comet-fenics.readthedocs.io/en/latest/intro.html
-* https://comet-fenics.readthedocs.io/en/latest/demo/elasticity/2D_elasticity.py.html
+---
 
-## Acknowledgement
-The original source code was developed by Jan Friederich.
-Restructuring, clean-up, documentation, and extensions have been developed by Sudershan Reddy Nagireddy.
+## 🔍 Open in ParaView
+
+### GUI:
+
+Click **“Open ParaView”**
+
+### Manual:
+
+1. Open ParaView
+2. File → Load State
+3. Select `view_results.pvsm`
+
+---
+
+# 🪟 Windows + WSL Support
+
+* GUI automatically:
+
+  * Converts Linux paths → Windows paths
+  * Opens folders in Windows Explorer
+  * Launches ParaView on Windows
+
+---
+
+
+# 📦 Requirements
+
+## Required
+
+* Docker (recommended)
+* OR Conda / Mamba
+
+## Windows users
+
+* Install **WSL (Ubuntu)**
+* Install Docker Desktop
+
+---

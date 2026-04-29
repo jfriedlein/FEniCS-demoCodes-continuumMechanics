@@ -1,28 +1,35 @@
 #!/bin/bash
 
-# 1. Store the root directory
 BASE_DIR=$(pwd)
 
-echo "Current Root: $BASE_DIR"
-echo "Enter the relative path to the folder (e.g., 01-elasto-static/01-tractions):"
-read -e script_path
+SCRIPT_PATH=$1
+MODE=$2   # "docker" or "local"
 
-# 2. Define the absolute path to the target folder
-TARGET_DIR="$BASE_DIR/$script_path"
-# NEW: Define PARENT_DIR so we can find results.py outside the target
+if [[ -z "$SCRIPT_PATH" || -z "$MODE" ]]; then
+    echo "Direct usage: ./run.sh <path> <docker|local>"
+    echo "Starting command line usage ..."
+    echo "Current Root: $BASE_DIR"
+    echo "Enter the relative path to the folder (e.g., 01-elasto-static/01-tractions):"
+    read -e SCRIPT_PATH
+    echo "Do you want to execute in Docker? [y/n]:"
+    read input
+    if [[ "$input" == "y" ]]; then
+        MODE="docker"
+    else
+        MODE="local"
+    fi
+fi
+
+TARGET_DIR="$BASE_DIR/$SCRIPT_PATH"
 PARENT_DIR=$(dirname "$TARGET_DIR")
 
-# Check if main.py exists in that folder
 if [[ ! -f "$TARGET_DIR/main.py" ]]; then
-    echo "ERROR: 'main.py' not found in $TARGET_DIR!"
+    echo "ERROR: main.py not found in $TARGET_DIR!"
     exit 1
 fi
 
-echo "Do you want to execute in Docker? [y/n]:"
-read input
+if [[ "$MODE" == "docker" ]]; then
 
-if [[ "$input" == "y" || "$input" == "Y" ]]; then
-    
     IMAGE_NAME="fenics-tool-offline:v1"
 
     echo "[STEP 1/3] Loading Docker image if needed..."
@@ -40,32 +47,29 @@ if [[ "$input" == "y" || "$input" == "Y" ]]; then
         exit 1
     fi
 
-    #  choose results.py from subfolder first, then root
     if [[ -f "$TARGET_DIR/results.py" ]]; then
-        RESULTS_LOCAL="$TARGET_DIR/results.py"
         RESULTS_CONTAINER="/app/results.py"
         MOUNT_RESULTS="-v $TARGET_DIR:/app"
     elif [[ -f "$PARENT_DIR/results.py" ]]; then
-        RESULTS_LOCAL="$PARENT_DIR/results.py"
         RESULTS_CONTAINER="/scripts/results.py"
         MOUNT_RESULTS="-v $TARGET_DIR:/app -v $PARENT_DIR:/scripts"
     else
-        echo "ERROR: results.py not found in $TARGET_DIR or parent."
+        echo "ERROR: results.py not found."
         exit 1
     fi
 
-    echo "[STEP 3/3] Running ParaView results..."
-    docker run --rm $MOUNT_RESULTS -w /app $IMAGE_NAME conda run -n fenics-lkm-env pvbatch $RESULTS_CONTAINER
-    echo "Done! Files are saved in: $script_path"
+    echo "[STEP 3/3] Running ParaView..."
+    docker run --rm $MOUNT_RESULTS -w /app $IMAGE_NAME \
+        conda run -n fenics-lkm-env pvbatch $RESULTS_CONTAINER
 
-elif [[ "$input" == "n" || "$input" == "N" ]]; then
-    # LOCAL EXECUTION
-    echo "[STEP 1/3] creating local environment if not exists..."
+    echo "Done! Files saved in: $SCRIPT_PATH"
+
+else
+    echo "[STEP 1/3] Checking environment..."
     if ! conda info --envs | grep -q "fenics-lkm-env"; then
         conda env create -f "$BASE_DIR/environment/local/environment.yml"
     fi
 
-    # Move into the directory so Python saves files locally
     cd "$TARGET_DIR" || exit
     
     echo "[STEP 2/3] Running locally in $(pwd)..."
