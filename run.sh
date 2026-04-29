@@ -35,10 +35,13 @@ if [[ "$MODE" == "docker" ]]; then
     echo "[STEP 1/3] Loading Docker image if needed..."
     docker image inspect $IMAGE_NAME >/dev/null 2>&1 || docker load -i "$BASE_DIR/environment/docker/fenics_tool.tar"
 
-    echo "[STEP 2/3] Running Simulation..."
-    docker run --rm -v "$TARGET_DIR":/app $IMAGE_NAME \
-        conda run -n fenics-lkm-env python /app/main.py
-
+    # [CRITICAL CHANGE]
+    # We mount $TARGET_DIR directly to /app. 
+    # This means Python's "current directory" inside Docker is your subfolder.
+    
+    echo "[STEP 2/3] Running Simulation (Files will save to $script_path)..."
+    docker run --rm -v "$TARGET_DIR":/app $IMAGE_NAME conda run -n fenics-lkm-env python /app/main.py
+    
     if [ $? -ne 0 ]; then
         echo "Simulation failed."
         exit 1
@@ -68,23 +71,26 @@ else
     fi
 
     cd "$TARGET_DIR" || exit
-
-    echo "[STEP 2/3] Running locally..."
+    
+    echo "[STEP 2/3] Running locally in $(pwd)..."
     conda run -n fenics-lkm-env python main.py
 
+    # Step 3: choose results.py from subfolder first, then root
     if [[ -f "$TARGET_DIR/results.py" ]]; then
         RESULTS_LOCAL="$TARGET_DIR/results.py"
     elif [[ -f "$PARENT_DIR/results.py" ]]; then
         RESULTS_LOCAL="$PARENT_DIR/results.py"
     else
-        echo "ERROR: results.py not found."
+        echo "ERROR: results.py not found in $TARGET_DIR or parent."
         cd "$BASE_DIR"
         exit 1
     fi
 
-    echo "[STEP 3/3] Running ParaView..."
+    echo "[STEP 3/3] Running ParaView results..."
     conda run -n fenics-lkm-env pvbatch "$RESULTS_LOCAL"
 
     echo "Done! Files saved in $(pwd)"
+
+    # Return to root
     cd "$BASE_DIR"
 fi
