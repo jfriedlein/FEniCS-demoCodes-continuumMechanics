@@ -77,13 +77,9 @@ lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu)) # Lame's first parameter
 #mu    = E/(2.0*(1.0 + nu)) #PLANE STRESS
 #lmbda = E*nu/((1.0 + nu)*(1.0 - nu)) #PLANE STRESS
 
-#rho = 8.e3
-#g = 9.81
-
-
 # Volume force/ heat source and prescribed tractions/ prescribed heat fluxes
 b = Constant((0.0, 0.0, 0.0)) # body force in N/m^3
-t_p = Constant((0.0, 0.0, 0.0)) # surface traction vector  in N/m^2 (Pa) - zero for tension case, non-zero for compression case
+t_p = Constant((0.0, 0.0, 0.0)) # surface traction vector  in N/m^2 (Pa) - positive for tension case, negative for compression case
 
 # Dirichlet boundary conditions
 #class Near(SubDomain):
@@ -117,7 +113,7 @@ bcs = [DirichletBC(V.sub(0), Constant(0.0), boundaries, left), # fix x-displacem
        ]
 
 #---------------------------------------------------------------------------------------------------------
-#  Variational formulation of the Heat Equation (weak form)
+#  Variational formulation of the balance of linear momentum (weak form)
 #---------------------------------------------------------------------------------------------------------
 # Strain tensor
 def epsilon(u):
@@ -126,16 +122,6 @@ def epsilon(u):
 # Stress tensor (linear isotropic elasticity)
 def sigma(u):
     return lmbda*tr(epsilon(u))*Identity(dim) + 2.0*mu*epsilon(u)
-		   
-# Material parameters
-#E = 200.e9
-#nu = 0.3
-#mu    = E/(2.0*(1.0 + nu))
-#lmbda = E*nu/((1.0 + nu)*(1.0 - 2.0*nu))
-
-# Stress tensor (linear isotropic elasticity)
-#def sigma(u):
-#    return lmbda*tr(sym(grad(u)))*Identity(d) + 2.0*mu*sym(grad(u))
 		   
 # Weak form a==l
 a = inner(grad(delta_u), sigma(u))*dx # bilinear form
@@ -158,7 +144,7 @@ solve(a == l, u, bcs=bcs,
 #---------------------------------------------------------------------------------------------------------
 
 # Create displacement file
-u.rename("u", "displacement") # renam3e displacement for output
+u.rename("u", "displacement") # rename displacement for output
 File("displacement_in_meters.pvd", "compressed") << u # save displacement to file
 
 # Project stress field and create stress file
