@@ -200,7 +200,7 @@ gmsh.model.addPhysicalGroup(2, domain, 1)
 
 boundary = gmsh.model.getBoundary(result, oriented=False) # Extract boundary edges of geometry
 
-# containers for boundary tags
+#  containers for boundary tags
 left   = [] 
 right  = []
 bottom = []
@@ -302,7 +302,7 @@ for i in range(2, 6):   # i=0 is the coarsest mesh, we start from i=2
     print("n_elems={}, h_max={:.6f} ({:.3f}s)".format(
         mesh.num_cells(), mesh.hmax(), clock_mesh), flush=True)
 
-     # convert mesh markers into FEniCS boundary function for applying boundary conditions and integrating over boundaries
+    # convert mesh markers into FEniCS boundary function for applying boundary conditions and integrating over boundaries
     boundaries = MeshFunction("size_t", mesh, mvc)
     print("Unique boundary markers:", np.unique(boundaries.array()))
 

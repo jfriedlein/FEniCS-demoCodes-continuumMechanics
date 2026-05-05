@@ -9,6 +9,7 @@ dependencies:
   - fenics-fiat
   - fenics-dijitso
   - gmsh
+  - python-gmsh
   - meshio
   - h5py
   - paraview=6.0.1

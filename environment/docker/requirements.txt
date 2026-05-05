@@ -13,3 +13,5 @@ pybind11
 pybind11_global 
 slepc4py 
 sympy 
+gmsh
+meshio
