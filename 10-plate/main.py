@@ -14,7 +14,7 @@ This script performs a 2D static linear elasticity analysis of a rectangular iso
 
 Geometry & Mesh:
 
-- 2D Rectangular Plate: 2L × L domain
+- 2D Rectangular Plate: L × L domain
 - Central Elliptical Hole: semi-axes A and B
 - Mesh generated using Gmsh with uniform refinement
 - Mesh converted to FEniCS format using meshio (XDMF)
@@ -28,11 +28,11 @@ Material Model:
 - Lamé parameters λ and μ computed from E and ν
 
 
-Boundary Conditions:
+Boundary Conditions (BCs):
 
  Dirichlet BCs:
-    - Right boundary: prescribed displacement
-    - Bottom boundary: constrained to prevent rigid body motion
+    - Right boundary: prescribed displacement to model symmetry boundary conditions
+    - Bottom boundary: prescribed displacement to model symmetry boundary conditions
  Neumann BCs:
     - Left and top boundaries: traction applied using analytical stress field
  Elliptical hole boundary: traction-free condition
@@ -41,31 +41,26 @@ Analytical Solution:
 
 Kirsch-type analytical stress solution implemented in compiled C++ expression
 Used to:
-
-   Define consistent boundary tractions
-   Compute stress error norm
-   Validate FEM accuracy
+- Define consistent boundary tractions
+- Compute stress error norm
+- Validate FEM accuracy
 
 Mesh Strategy:
-
 - Mesh refinement loop with decreasing element size
 - Used for convergence study and error analysis
 
 Post-processing:
-
 - Displacement field exported for visualization
 - Stress field projected and saved in MPa
 - L2 stress error computed between FEM and analytical solution
 - Convergence results stored in text file
 
 Main Objective:
-
 - Study stress concentration around elliptical holes
 - Validate FEM solution against analytical benchmark
 - Analyze convergence behavior under mesh refinement
 
 Main Learnings:
-
 - Integrating Gmsh + meshio workflow to generate complex geometries (plate with elliptical hole) and import them into FEniCS
 - Using physical groups in Gmsh to correctly define and transfer boundary markers for applying boundary conditions
 - Embedding analytical solutions via compiled C++ expressions (pybind11) for efficient evaluation inside FEM
