@@ -74,7 +74,9 @@ FENICS-LINEAR-CONTINUUM/
      sudo apt-get update
      sudo apt install (path to...)/docker-desktop-amd64.deb
      ```
-  * Launch Docker desktop (accept "Docker Subscription Service Agreement")
+* Launch Docker desktop (accept "Docker Subscription Service Agreement")
+* Download Docker image containing FEniCS etc.: https://github.com/jfriedlein/FEniCS-demoCodes-continuumMechanics/blob/master/environment/docker/fenics_tool.tar
+* Set up "fenics_tool.tar" container in Docker
 * In case of error message "The path ... is not shared from the host and is not known to Docker."
   * Docker Desktop → Settings (or Preferences) → Resources → File Sharing. Add the problematic path (or its parent directory) to the shared list
 ---
