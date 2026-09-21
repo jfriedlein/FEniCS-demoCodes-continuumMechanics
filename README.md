@@ -40,6 +40,45 @@ FENICS-LINEAR-CONTINUUM/
 
 ---
 
+# How to Setup and Install
+* Download the repository as .zip
+* Unzip the downloaded file "FEniCS-demoCodes-continuumMechanics-master.zip"
+* Download and install Docker following the instructions on https://docs.docker.com/desktop/, e.g. for [Linux](https://docs.docker.com/desktop/setup/install/linux/ubuntu/#install-docker-desktop)
+  * Install Docker Engine (https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+    ```bash
+    # Add Docker's official GPG key:
+    sudo apt update
+    sudo apt install ca-certificates curl
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+    
+    # Add the repository to Apt sources:
+    sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+    Types: deb
+    URIs: https://download.docker.com/linux/ubuntu
+    Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+    Components: stable
+    Signed-By: /etc/apt/keyrings/docker.asc
+    EOF
+    
+    sudo apt update
+
+    sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    sudo docker run hello-world
+    ```
+  * Download DEB package "docker-desktop-amd64.deb"
+  *  Install the DEB package
+     ```bash
+     sudo apt-get update
+     sudo apt install (path to...)/docker-desktop-amd64.deb
+     ```
+  * Launch Docker desktop (accept "Docker Subscription Service Agreement")
+* In case of error message "The path ... is not shared from the host and is not known to Docker."
+  * Docker Desktop → Settings (or Preferences) → Resources → File Sharing. Add the problematic path (or its parent directory) to the shared list
+---
+
 # 🚀 How to Run
 
 ## Option 1 — GUI (Recommended)
