@@ -34,8 +34,6 @@ FENICS-LINEAR-CONTINUUM/
 │
 ├── gui.py                      # Graphical interface to browse and run simulations
 ├── run.sh                      # Main execution script (used by GUI and CLI)
-├── slides/
-│   └── lkm-demo.pdf
 │
 └── README.md
 ```
