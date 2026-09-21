@@ -209,3 +209,6 @@ Click **“Open ParaView”**
 * Install Docker Desktop
 
 ---
+# Acknowledgement
+The original source code was developed by Jan Friederich.
+Restructuring, clean-up, documentation, and extensions have been developed by Sudershan Reddy Nagireddy [@SudershanR](https://github.com/SudershanR).
